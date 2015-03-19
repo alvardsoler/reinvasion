@@ -1,0 +1,73 @@
+<%--
+ 	Standard header for all jsp pages in the site. Requires the following model variables to be set:
+  	- pageTitle
+  	- pageExtraCSS: additional CSS files to include (from resources/css; via link rel-stylesheet href)
+  	- pageExtraScripts: additional JS files to include (from resources/js; via script src)
+ --%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="https://www.owasp.org/index.php/OWASP_Java_Encoder_Project" prefix="e" %>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>${pageTitle}</title>
+<link rel="stylesheet"
+	href="${prefix}resources/js/jquery-ui-1.11.2/jquery-ui.min.css">
+<script
+	src="${prefix}resources/js/jquery-ui-1.11.2/external/jquery/jquery.js"></script>
+<script src="${prefix}resources/js/jquery-ui-1.11.2/jquery-ui.min.js"></script>
+<!-- Include one of jTable styles. -->
+<link
+	href="${prefix}resources/js/jtable/themes/metro/lightgray/jtable.css"
+	rel="stylesheet" type="text/css" />
+
+<!-- Include jTable script file. -->
+<script src="${prefix}resources/js/jtable/jquery.jtable.min.js"
+	type="text/javascript"></script>
+
+<!-- Include jqvmap script file. -->
+<%-- <script src="${prefix}resources/js/jqvmap/jquery.vmap.js" type="text/javascript"></script> --%>
+<%-- <script src="${prefix}resources/js/jqvmap/maps/jquery.vmap.europe.js" type="text/javascript"></script> --%>
+
+<link rel="stylesheet" href="${prefix}resources/js/jqvmap/jqvmap.css">
+
+<link rel="stylesheet" href="${prefix}resources/css/main.css">
+<%-- pageExtraScripts --%>
+<c:forEach var="i" items="${pageExtraScripts}">
+	<script src="${prefix}resources/js/${i}"></script>
+</c:forEach>
+<%-- pageExtraCSS --%>
+<c:forEach var="i" items="${pageExtraCSS}">
+	<link rel="stylesheet" href="${prefix}resources/css/${i}">
+</c:forEach>
+</head>
+<body>
+	<div id="page">
+		<div id="intro">
+			<img alt="banner" src="${prefix}resources/img/banner.png" />
+			<!-- 			<h1> -->
+			<!-- 				Se puede rellenar con texto, lo suyo sería poner la imagen aquí con img -->
+			<!-- 			</h1> -->
+		</div>
+		<div id="menu">
+			<c:choose>
+
+				<c:when test="${not empty username}">
+					<!-- Loggeado -->
+					<a href="${prefix}home">Inicio</a>
+					<a href="${prefix}partidas">Partidas</a>
+					<a href="${prefix}usuario/${e:forHtmlContent(username)}">Usuario</a>
+					<a href="${prefix}ranking">Ranking</a>
+					<c:if test="${role=='admin'}">
+						<a href="${prefix}admin">Admin</a>
+					</c:if>
+					<a href="${prefix}logout">Logout</a>
+				</c:when>
+				<c:otherwise>
+					<a href="${prefix}home">Inicio</a>
+					<a href="${prefix}login">Login</a>
+					<a href="${prefix}registro">Registro</a>
+					<a href="${prefix}ranking">Ranking</a>
+				</c:otherwise>
+			</c:choose>
+		</div>

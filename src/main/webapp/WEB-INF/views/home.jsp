@@ -1,14 +1,28 @@
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ page session="false" %>
-<html>
-<head>
-	<title>Home</title>
-</head>
-<body>
-<h1>
-	Hello world!  
-</h1>
+<%@ include file="../fragments/header.jspf" %>
+<div id="content">
+			<br />
+			<div id="text">
+				<h1>INVASION</h1>
 
-<P>  The time on the server is ${serverTime}. </P>
-</body>
-</html>
+				<p>
+					Bienvenidos a Invasion, un juego de estrategia donde podrás
+					disfrutar de varios mapas, enfrentarte a tus rivales, chatear con
+					ellos y comentar tus jugadas. <br />
+				</p>
+
+				<p>
+					¡Registrate ya! ¿¿A que esperas??<br />
+				</p>
+
+				<p>Demuestra lo que vales y conquista el mundo en inumerables
+					batallas, deslumbra al rival en cada turno con tu táctica. Prueba
+					los diferentes modos de juego.</p>
+				<img id="mapa" src="resources/img/mapa.jpg"/>
+				
+				<p>Aquí puedes ver las reglas:  <a href="resources/res/Invasion.pdf">Reglas</a></p>
+			</div>
+
+			<div class="end"></div>
+		</div>
+
+<%@ include file="../fragments/footer.jspf" %>

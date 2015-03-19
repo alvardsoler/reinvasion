@@ -12,6 +12,21 @@
 		<org.springframework-version>3.1.1.RELEASE</org.springframework-version>
 		<org.aspectj-version>1.6.10</org.aspectj-version>
 		<org.slf4j-version>1.6.6</org.slf4j-version>
+		
+		<!-- Keep in sync... Copied&Pasted form the PetClinic example -->
+		<spring-framework.version>3.2.2.RELEASE</spring-framework.version>
+		<org.springframework-version>3.2.2.RELEASE</org.springframework-version>
+
+		<!-- Hibernate / JPA -->
+		<hibernate.version>4.3.1.Final</hibernate.version>
+		<spring-data-jpa.version>1.2.0.RELEASE</spring-data-jpa.version>
+		
+		<!-- Bean validation -->
+		<hibernate-validator.version>4.3.1.Final</hibernate-validator.version>
+		
+		<!-- Database access -->
+		<tomcat-jdbc.version>7.0.42</tomcat-jdbc.version>
+		<hsqldb.version>2.3.2</hsqldb.version>
 	</properties>
 	<dependencies>
 		<!-- Spring -->
@@ -83,6 +98,91 @@
 			<scope>runtime</scope>
 		</dependency>
 
+		<!-- SPRING, SPRING, SPRINGITY SPRING -->
+		<dependency>
+			<groupId>org.springframework.data</groupId>
+			<artifactId>spring-data-jpa</artifactId>
+			<version>${spring-data-jpa.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-beans</artifactId>
+			<version>${spring-framework.version}</version>
+		</dependency>
+		<dependency> 
+     		<groupId>org.springframework</groupId> 
+     		<artifactId>spring-aspects</artifactId> 
+     		<version>${spring-framework.version}</version>
+		</dependency>
+		<dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-core</artifactId>
+        	<version>${spring-framework.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-jdbc</artifactId>
+			<version>${spring-framework.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-aop</artifactId>
+			<version>${spring-framework.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-tx</artifactId>
+			<version>${spring-framework.version}</version>
+		</dependency>
+
+		<!-- Database connection pool 
+		See here for more details on commons-dbcp versus tomcat-jdbc: 
+    	http://blog.ippon.fr/2013/03/13/improving-the-performance-of-the-spring-petclinic-sample-application-part-3-of-5/
+    -->
+		<dependency>
+			<groupId>org.apache.tomcat</groupId>
+			<artifactId>tomcat-jdbc</artifactId>
+			<version>${tomcat-jdbc.version}</version>
+			<scope>runtime</scope>
+		</dependency>
+
+		<!-- HIBERNATE -->
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-entitymanager</artifactId>
+			<version>${hibernate.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-validator</artifactId>
+			<version>${hibernate-validator.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-ehcache</artifactId>
+			<version>${hibernate.version}</version>
+		</dependency>
+  		<dependency>
+			<groupId>org.hsqldb</groupId>
+			<artifactId>hsqldb</artifactId>
+			<version>2.0.0</version>
+    	</dependency>
+    	
+    	<!-- ioutils: much, much better than default IO -->
+    	<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.4</version>
+		</dependency>
+
+		<!-- file uploading -->
+		<dependency>
+  			<groupId>commons-fileupload</groupId>
+  			<artifactId>commons-fileupload</artifactId>
+  			<version>1.2.2</version>
+		</dependency>
+
 		<!-- @Inject -->
 		<dependency>
 			<groupId>javax.inject</groupId>
@@ -108,6 +208,13 @@
 			<artifactId>jstl</artifactId>
 			<version>1.2</version>
 		</dependency>
+		
+		<!-- XSS -->
+		<dependency>
+			<groupId>org.owasp.encoder</groupId>
+			<artifactId>encoder-jsp</artifactId>
+			<version>1.1.1</version>
+		</dependency>
 	
 		<!-- Test -->
 		<dependency>
@@ -115,7 +222,20 @@
 			<artifactId>junit</artifactId>
 			<version>4.7</version>
 			<scope>test</scope>
-		</dependency>        
+		</dependency>
+		<dependency>
+			<groupId>org.apache.tomcat</groupId>
+			<artifactId>catalina</artifactId>
+			<version>6.0.20</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>1.7.1</version>
+		</dependency>
+
 	</dependencies>
     <build>
         <plugins>
@@ -145,14 +265,32 @@
                     <showDeprecation>true</showDeprecation>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>1.2.1</version>
-                <configuration>
-                    <mainClass>org.test.int1.Main</mainClass>
-                </configuration>
-            </plugin>
+            
+            <!-- 
+            	HSQL + Hibernate: create DBs; 
+            	write 'mvn compile hibernate3:hbm2ddl' at console to regenerate 
+            -->
+			<plugin>
+        		<groupId>org.codehaus.mojo</groupId>
+        		<artifactId>hibernate3-maven-plugin</artifactId>
+        		<version>2.2</version>
+        		<configuration>
+          			<components>
+            			<component>
+              				<name>hbm2ddl</name>
+              				<implementation>jpaconfiguration</implementation>
+            			</component>
+          			</components>
+          			<componentProperties>
+						<persistenceunit>demoPU</persistenceunit>
+						<outputfilename>schema.ddl</outputfilename>
+						<drop>false</drop>
+						<create>true</create>
+						<export>false</export>
+						<format>true</format>
+					</componentProperties>
+        		</configuration>         		
+      		</plugin>      		
         </plugins>
     </build>
 </project>
