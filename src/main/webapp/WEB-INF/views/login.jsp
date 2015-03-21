@@ -1,14 +1,46 @@
 <%@ include file="../fragments/header.jspf"%>
+
+
+<script type="text/javascript">
+	$(function() {
+		$("#login").blur(function() {
+			if ($("#login").val().length < 3)
+				// 				$("#usernametr").append("X");
+				console.log("mas letras");
+		});
+		$(".loguser").click(function() {
+			var username = $("#login").val();
+			var password = $("#pass").val();
+			$.ajax({
+				method : "POST",
+				url : "${prefix}loginUser",
+				data : {
+					username : username,
+					password : password
+				},
+				dataType : "json",
+				success : function(data) {
+					if (data.res == "YES")
+						alert("ok");
+					else
+						alert("NOPE");
+				}
+
+			});
+
+		})
+	})
+</script>
 <div id="content">
 	<br />
 	<div id="text">
 		<h1>LOGIN</h1>
 		<br />
-		<form id="signinForm" method="POST" action="loguser">
+		<form id="signinForm">
 			<fieldset>
 				<table id="userData" class="center">
 
-					<tr>
+					<tr id="usernametr">
 						<th><label for="user">Nombre de usuario: </label></th>
 						<th><input id="login" type="text" name="login" value=""
 							placeholder="Name" required /></th>
@@ -23,8 +55,7 @@
 					</tr>
 
 					<tr>
-						<th><input type="submit" class="submit" name="loguser"
-							value="Acceder" /></th>
+						<th><button class="loguser">Acceder</button></th>
 						<th><input type="button" name="lost"
 							value="He perdido mi clave" /></th>
 					</tr>
@@ -37,13 +68,13 @@
 						</label></th>
 					</tr>
 					<tr>
-						<th><input type="hidden" id="source" name="source"
-							value="${requestScope['javax.servlet.forward.servlet_path']}" />
-						</th>
+						<!-- 						<th><input type="hidden" id="source" name="source" -->
+						<%-- 							value="${requestScope['javax.servlet.forward.servlet_path']}" /> --%>
+						<!-- 						</th> -->
 					</tr>
 					<c:if test="${not empty loginError}">
 						<br>
-						<span class='errorLogin'>Login o contraseña incorrectos</span>
+						<span class='errormsg'>Login o contraseña incorrectos</span>
 					</c:if>
 				</table>
 			</fieldset>
