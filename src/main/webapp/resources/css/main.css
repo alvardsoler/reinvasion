@@ -168,6 +168,12 @@ a:hover {
 	margin-right: auto;
 }
 
+#errormsg {
+	margin-left: auto;
+	margin-right: auto;
+	color: red;
+}
+
 #tablaPartidas table, tr, td{
 	margin-top: 2em;
 	border-collapse: collapse;

@@ -3,6 +3,7 @@
 
 <script type="text/javascript">
 	$(function() {
+		$("#errormsg").hide();
 		$("#login").blur(function() {
 			if ($("#login").val().length < 3)
 				// 				$("#usernametr").append("X");
@@ -13,6 +14,7 @@
 			var password = $("#pass").val();
 			$.ajax({
 				method : "POST",
+
 				url : "${prefix}loginUser",
 				data : {
 					username : username,
@@ -22,11 +24,14 @@
 				success : function(data) {
 					if (data.res == "YES")
 						alert("ok");
-					else
-						alert("NOPE");
+					else {
+						$("#errormsg").show();
+					}
+
 				}
 
 			});
+			return false;
 
 		})
 	})
@@ -59,23 +64,19 @@
 						<th><input type="button" name="lost"
 							value="He perdido mi clave" /></th>
 					</tr>
+
 				</table>
-				<br /> <br />
+
 				<table class="center">
 					<tr>
+						<th><label id="errormsg">Datos de acceso incorrectos</label></th>
+					</tr>
+					<tr>
+
 						<th><label> <input type="checkbox" name="remember_me"
 								id="remember_me" /> Recordar en este ordenador
 						</label></th>
 					</tr>
-					<tr>
-						<!-- 						<th><input type="hidden" id="source" name="source" -->
-						<%-- 							value="${requestScope['javax.servlet.forward.servlet_path']}" /> --%>
-						<!-- 						</th> -->
-					</tr>
-					<c:if test="${not empty loginError}">
-						<br>
-						<span class='errormsg'>Login o contraseña incorrectos</span>
-					</c:if>
 				</table>
 			</fieldset>
 		</form>
