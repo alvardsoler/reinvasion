@@ -123,7 +123,7 @@ public class LeerMapa {
     }
 
     public static void main(String [] arg) throws FileNotFoundException, IOException{
-        LeerMapa mapa = new LeerMapa("/home/furia/git/furia77/invasion2/src/main/java/es/ucm/invasion/juego/Mapa");
+        LeerMapa mapa = new LeerMapa("/home/furia/git/furia77/invasion2/src/main/java/es/ucm/invasion/juego/mapa");
         JuegoPartida p = new JuegoPartida();
         p.addJugador("azul");
         p.addJugador("rojo");

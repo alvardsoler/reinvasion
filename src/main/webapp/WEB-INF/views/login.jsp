@@ -61,8 +61,7 @@
 
 					<tr>
 						<th><button class="loguser">Acceder</button></th>
-						<th><input type="button" name="lost"
-							value="He perdido mi clave" /></th>
+						<th><button class="lost">He perdido mi clave</button></th>
 					</tr>
 
 				</table>
