@@ -22,7 +22,7 @@ import es.ucm.reinvasion.juego.LeerMapa;
 @Entity
 @NamedQueries({
 		@NamedQuery(name = "partidaById", query = "select p from Partida p where p.id = :idParam"),
-		@NamedQuery(name = "partidaByNombre", query = "select p from Partida p where p.nombe = :nombreParam"),
+		@NamedQuery(name = "partidaByNombre", query = "select p from Partida p where p.nombre = :nombreParam"),
 		@NamedQuery(name = "partidaByCreador", query = "select p from Partida p where p.creador =:creadorParam") })
 public class Partida {
 	public enum EstadoPartida {

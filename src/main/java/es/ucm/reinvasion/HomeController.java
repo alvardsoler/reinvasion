@@ -1,5 +1,7 @@
 package es.ucm.reinvasion;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.transaction.Transactional;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import es.ucm.reinvasion.model.ServicioAplicacionUsuario;
 import es.ucm.reinvasion.model.Usuario;
 
 /**
@@ -25,15 +28,24 @@ public class HomeController {
 	private static final Logger logger = LoggerFactory
 			.getLogger(HomeController.class);
 
+	@PersistenceContext
+	private EntityManager entityManager;
+
 	@RequestMapping(value = "/registrarUsuario", method = RequestMethod.POST)
 	@ResponseBody
 	public String registroUser(@RequestParam("username") String username,
 			@RequestParam("email") String email,
 			@RequestParam("password") String pass,
 			@RequestParam("passwordValidation") String pass2,
-			HttpServletRequest request, Model model) {
+			HttpServletRequest request, Model model, HttpSession session) {
 		logger.info("Intentando registrar con: {} {}", username, email);
-
+		if (pass.equals(pass2)) {
+			Usuario u = ServicioAplicacionUsuario.create(entityManager,
+					username, email, pass);
+			if (u != null)
+				session.setAttribute("usuario", u);
+		} else
+			return "{\"res\": \"NOPE\",\"msg\": \"Las claves no coinciden\"}";
 		return "{\"res\": \"YES\"}";
 	}
 
@@ -58,9 +70,10 @@ public class HomeController {
 	/**
 	 * Simply selects the home view to render by returning its name.
 	 */
-	@RequestMapping(value = "/", method = RequestMethod.GET)
+	@RequestMapping(value = { "/", "home" }, method = RequestMethod.GET)
 	public String home(Model model) {
 		logger.info("VIEW: Welcome home!");
+		model.addAttribute("pageTitle", "Home - Invasion Strategy Game");
 
 		return "home";
 	}
@@ -69,6 +82,8 @@ public class HomeController {
 	public String partidasView(@PathVariable("idPartida") long idPartida,
 			Model model) {
 		logger.info("VIEW: Cargando la partida {}", idPartida);
+		model.addAttribute("prefix", "../");
+		model.addAttribute("pageTitle", "Partida - Invasion Strategy Game");
 		return "partida";
 	}
 
@@ -76,6 +91,8 @@ public class HomeController {
 	public String partidasView(@PathVariable("username") String username,
 			Model model) {
 		logger.info("VIEW: Cargando las partidas del usuario {}", username);
+		model.addAttribute("prefix", "../");
+		model.addAttribute("pageTitle", "Partidas - Invasion Strategy Game");
 		return "partidas";
 	}
 
@@ -83,30 +100,50 @@ public class HomeController {
 	public String userView(@PathVariable("username") String username,
 			Model model) {
 		logger.info("VIEW: Cargando el usuario {}", username);
+		model.addAttribute("prefix", "../");
+		model.addAttribute("pageTitle", "Usuario - Invasion Strategy Game");
+
 		return "usuario";
+	}
+
+	@RequestMapping(value = "/login", method = RequestMethod.GET)
+	public String loginView(Model model) {
+		logger.info("VIEW: Cargando login");
+		model.addAttribute("pageTitle", "Login - Invasion Strategy Game");
+
+		return "login";
 	}
 
 	@RequestMapping(value = "/ranking", method = RequestMethod.GET)
 	public String rankingView(Model model) {
 		logger.info("VIEW: Cargando el ranking");
+		model.addAttribute("pageTitle", "Ranking - Invasion Strategy Game");
+
 		return "ranking";
 	}
 
 	@RequestMapping(value = "/admin", method = RequestMethod.GET)
-	public String adminView(Model model) {
+	public String adminView(Model model, HttpSession session) {
 		logger.info("VIEW: Cargando panel de admin");
-		return "admin";
+		model.addAttribute("pageTitle", "Admin - Invasion Strategy Game");
+		if (isAdmin(session))
+			return "admin";
+		else
+			return "home";
 	}
 
 	@RequestMapping(value = "/logout", method = RequestMethod.GET)
-	public String logout(Model model) {
+	public String logout(Model model, HttpSession session) {
 		logger.info("VIEW: Logout...");
+		session.invalidate();
 		return "login";
 	}
 
 	@RequestMapping(value = "/registro", method = RequestMethod.GET)
 	public String registroView(Model model) {
 		logger.info("VIEW: Cargando registro");
+		model.addAttribute("pageTitle", "Registro - Invasion Strategy Game");
+
 		return "registro";
 	}
 
