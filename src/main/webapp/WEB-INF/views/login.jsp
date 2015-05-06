@@ -58,7 +58,9 @@
 						<th><input id="pass" type="password" name="pass" value=""
 							placeholder="Password" required /></th>
 					</tr>
-
+					<tr>
+						<th><br /></th>
+					</tr>
 					<tr>
 						<th><button class="loguser">Acceder</button></th>
 						<th><button class="lost">He perdido mi clave</button></th>

@@ -56,11 +56,11 @@
 		<div id="menu">
 			<c:choose>
 
-				<c:when test="${not empty username}">
+				<c:when test="${not empty usuario}">
 					<!-- Loggeado -->
 					<a href="${prefix}home">Inicio</a>
-					<a href="${prefix}partidas">Partidas</a>
-					<a href="${prefix}usuario/${e:forHtmlContent(username)}">Usuario</a>
+					<a href="${prefix}partidas/${e:forHtmlContent(usuario.login)}">Partidas</a>
+					<a href="${prefix}usuario/${e:forHtmlContent(usuario.login)}">Usuario</a>
 					<a href="${prefix}ranking">Ranking</a>
 					<c:if test="${role=='admin'}">
 						<a href="${prefix}admin">Admin</a>

@@ -19,10 +19,12 @@
 								},
 								dataType : "json",
 								success : function(data) {
+									console.log("ok");
+									alert("ok");
 									if (data.res == "YES")
-										alert("ok");
+										console.log("ok");
 									else {
-										alert("nop");
+										console.log("nop");
 									}
 
 								}

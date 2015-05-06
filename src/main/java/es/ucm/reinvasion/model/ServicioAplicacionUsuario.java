@@ -10,9 +10,9 @@ public abstract class ServicioAplicacionUsuario {
 		Usuario u = null;
 		try {
 			// Se comprueba que el username no está ya registrado
-			u = (Usuario) entityManager.createNamedQuery("userByLogin")
+			u = (Usuario) entityManager.createNamedQuery("usuarioByLogin")
 					.setParameter("loginParam", username).getSingleResult();
-			u = (Usuario) entityManager.createNamedQuery("userByEmail")
+			u = (Usuario) entityManager.createNamedQuery("usuarioByEmail")
 					.setParameter("emailParam", email).getSingleResult();
 			return null;
 		} catch (NoResultException exception) {
@@ -26,7 +26,7 @@ public abstract class ServicioAplicacionUsuario {
 
 	public static Usuario read(EntityManager entityManager, String username) {
 		try {
-			return (Usuario) entityManager.createNamedQuery("userByLogin")
+			return (Usuario) entityManager.createNamedQuery("usuarioByLogin")
 					.setParameter("loginParam", username).getSingleResult();
 		} catch (NoResultException exception) {
 			return null;
