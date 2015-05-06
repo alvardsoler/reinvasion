@@ -26,7 +26,6 @@
 									else {
 										console.log("nop");
 									}
-
 								}
 
 							});
