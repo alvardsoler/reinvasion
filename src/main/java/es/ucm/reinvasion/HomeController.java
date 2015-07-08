@@ -4,7 +4,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import javax.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.google.gson.Gson;
 
 import es.ucm.reinvasion.model.ServicioAplicacionUsuario;
 import es.ucm.reinvasion.model.Usuario;
@@ -33,6 +35,7 @@ public class HomeController {
 
 	@RequestMapping(value = "/registrarUsuario", method = RequestMethod.POST)
 	@ResponseBody
+	@Transactional
 	public String registroUser(@RequestParam("username") String username,
 			@RequestParam("email") String email,
 			@RequestParam("password") String pass,
@@ -42,23 +45,28 @@ public class HomeController {
 		if (pass.equals(pass2)) {
 			Usuario u = ServicioAplicacionUsuario.create(entityManager,
 					username, email, pass);
-			if (u != null)
+			if (u != null) {
 				session.setAttribute("usuario", u);
+				return "{\"res\": \"YES\"}";
+			}
+
 		} else
 			return "{\"res\": \"NOPE\",\"msg\": \"Las claves no coinciden\"}";
-		return "{\"res\": \"YES\"}";
+		return "{\"res\": \"NOPE\",\"msg\": \"Algún error al crear el usuario\"}";
 	}
 
 	@RequestMapping(value = "/loginUser", method = RequestMethod.POST)
 	@ResponseBody
-	@Transactional
 	public String loginUser(@RequestParam("username") String username,
 			@RequestParam("password") String pass, HttpServletRequest request,
-			Model model) {
+			Model model, HttpSession session) {
 		logger.info("Intentando iniciar sesión con: {} {}", username, pass);
-		if (username.length() > 3) {
+		ServicioAplicacionUsuario sau = new ServicioAplicacionUsuario();
+		Usuario u = sau.readByUsername(entityManager, username);
+		if (u != null && u.isPassValid(pass)) {
 			logger.info("ok");
-			return "{\"res\": \"YES\"}";
+			session.setAttribute("usuario", u);
+			return "{\"res\": \"YES\", \"to\": \"" + u.getLogin() + "\"}";
 		} else {
 			logger.warn("nope");
 			return "{\"res\": \"NOPE\"}";
@@ -100,6 +108,7 @@ public class HomeController {
 	public String userView(@PathVariable("username") String username,
 			Model model) {
 		logger.info("VIEW: Cargando el usuario {}", username);
+		model.addAttribute("userViewed", entityManager.createNamedQuery("usuarioByLogin").setParameter("loginParam", username).getSingleResult());
 		model.addAttribute("prefix", "../");
 		model.addAttribute("pageTitle", "Usuario - Invasion Strategy Game");
 
