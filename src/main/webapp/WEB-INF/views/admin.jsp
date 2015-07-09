@@ -22,13 +22,12 @@
 						url : "${prefix}delUser",
 						data : {
 							username : username,
+							csrf: "${csrf_token}"
 						},
 						dataType : "json",
 						success : function(data) {
-							console.log("ok");
-							alert("ok");
 							if (data.res == "YES") {
-								alert("Usuario eliminad");
+								alert("Usuario eliminado");
 							} else {
 								alert("Error al eliminar el usuario");
 							}
@@ -124,7 +123,7 @@
 			});
 		</script>
 
-
+		
 		<div class="end"></div>
 	</div>
 	<%@ include file="../fragments/footer.jspf"%>

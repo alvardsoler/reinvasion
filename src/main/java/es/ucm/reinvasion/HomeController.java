@@ -1,6 +1,7 @@
 package es.ucm.reinvasion;
 
 import java.util.List;
+import java.util.UUID;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -35,6 +36,9 @@ public class HomeController {
 	@PersistenceContext
 	private EntityManager entityManager;
 
+	private static final String jsonOK = "{\"res\": \"YES\"}";
+	private static final String jsonNO = "{\"res\": \"NO\"}";
+
 	@RequestMapping(value = "/registrarUsuario", method = RequestMethod.POST)
 	@ResponseBody
 	@Transactional
@@ -68,6 +72,7 @@ public class HomeController {
 		if (u != null && u.isPassValid(pass)) {
 			logger.info("ok");
 			session.setAttribute("usuario", u);
+			getTokenForSession(session);
 			if (isAdmin(session))
 				return "{\"res\": \"YES\", \"to\": \"admin\"}";
 			else
@@ -78,13 +83,32 @@ public class HomeController {
 		}
 	}
 
+	@RequestMapping(value = "/updateUser", method = RequestMethod.POST)
+	@Transactional
+	@ResponseBody
+	public String updateUser(@RequestParam("idUser") long idUsuario,
+			@RequestParam("emaiUser") String email,
+			@RequestParam("passUser") String pass, HttpServletRequest request,
+			Model mode, HttpSession session) {
+		logger.info("Updating user {}", idUsuario);
+		if (isAdmin(session)
+				|| ((Usuario) session.getAttribute("usuario")).getId() == idUsuario) {
+			ServicioAplicacionUsuario sau = new ServicioAplicacionUsuario();
+			if (sau.update(entityManager, idUsuario, email, pass) != null)
+				return jsonOK;
+		}
+		return jsonNO;
+
+	}
+
 	@RequestMapping(value = "/delUser", method = RequestMethod.POST)
 	@Transactional
 	@ResponseBody
 	public String delUser(@RequestParam("username") String username,
-			HttpServletRequest request, Model mode, HttpSession session) {
+			@RequestParam("csrf") String token, HttpServletRequest request,
+			Model mode, HttpSession session) {
 		logger.info("Intentando eliminar el usuario {}", username);
-		if (isAdmin(session)) {
+		if (isAdmin(session) && isTokenValid(session, token)) {
 			ServicioAplicacionUsuario sau = new ServicioAplicacionUsuario();
 			if (sau.deleteByUsername(entityManager, username)) {
 				return "{\"res\": \"YES\"}";
@@ -203,6 +227,30 @@ public class HomeController {
 		} else {
 			return false;
 		}
+	}
+
+	/**
+	 * Get token for session and set it.
+	 * 
+	 * @param session
+	 * @return token
+	 */
+	private static String getTokenForSession(HttpSession session) {
+		String token = UUID.randomUUID().toString();
+		session.setAttribute("csrf_token", token);
+		return token;
+	}
+
+	/**
+	 * Check if token is valid.
+	 * 
+	 * @param session
+	 * @param token
+	 * @return if token is valid for session
+	 */
+	private static boolean isTokenValid(HttpSession session, String token) {
+		String t = (String) session.getAttribute("csrf_token");
+		return (t != null) && t.equals(token);
 	}
 
 }

@@ -57,17 +57,21 @@ public class ServicioAplicacionUsuario {
 	}
 
 	@Transactional
-	public static Usuario update(EntityManager entityManager, Usuario usuario,
+	public static Usuario update(EntityManager entityManager, long idUsuario,
 			String email, String pass) {
-		if (entityManager.contains(usuario)) {
-			usuario.setEmail(email);
-			usuario.setHashedAndSalted(Usuario.generateHashedAndSalted(pass,
-					usuario.getSalt()));
-			entityManager.persist(usuario);
-			return usuario;
-		} else {
-			return null;
+		Usuario u = readById(entityManager, idUsuario);
+		if (u != null) {
+			if (!email.equals("")) {
+				u.setEmail(email);
+			}
+			if (!pass.equals(""))
+				u.setHashedAndSalted(Usuario.generateHashedAndSalted(pass,
+						u.getSalt()));
+
+			entityManager.refresh(u);
+
 		}
+		return u;
 	}
 
 	@Transactional
