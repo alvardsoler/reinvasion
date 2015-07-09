@@ -14,7 +14,6 @@
 			var password = $("#pass").val();
 			$.ajax({
 				method : "POST",
-
 				url : "${prefix}loginUser",
 				data : {
 					username : username,
@@ -22,9 +21,13 @@
 				},
 				dataType : "json",
 				success : function(data) {
-					if (data.res == "YES")
+					if (data.res == "YES") {
 						alert("ok");
-					else {
+						if (data.to != "admin")
+							window.location.href = "partidas/" + data.to;
+						else
+							window.location.href = "admin";
+					} else {
 						$("#errormsg").show();
 					}
 
@@ -69,8 +72,9 @@
 				</table>
 
 				<table class="center">
-					<tr>
-						<th><label id="errormsg">Datos de acceso incorrectos</label></th>
+					<tr id="errormsg">
+						<th><label>Datos de acceso incorrectos</label> ¿Necesitas <a
+							href="registro">registrarte</a>?</th>
 					</tr>
 					<tr>
 

@@ -13,7 +13,7 @@
 						<tr>
 							<th>Nombre usuario:</th>
 							<th><input type="text" name="user"
-								value="${userViewed.username}" placeholder="Name" required /></th>
+								value="${userViewed.login}" placeholder="Name" required /></th>
 						</tr>
 						<tr>
 							<th><br /></th>

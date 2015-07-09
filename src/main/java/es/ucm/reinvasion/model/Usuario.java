@@ -31,7 +31,7 @@ public class Usuario {
 	private List<Partida> partidas;
 
 	public Usuario() {
-	};
+	}
 
 	public static Usuario createUser(String login, String email, String pass,
 			String rol) {
@@ -39,7 +39,7 @@ public class Usuario {
 		u.login = login;
 		u.email = email;
 		Random r = new Random();
-
+		u.puntos = 0;
 		// generate new, random salt; build hashedAndSalted
 		byte[] saltBytes = new byte[16];
 		r.nextBytes(saltBytes);
@@ -127,7 +127,7 @@ public class Usuario {
 		return id;
 	}
 
-	@Column(unique = true)
+	@Column(unique = true, nullable = false)
 	public String getLogin() {
 		return login;
 	}
@@ -136,6 +136,7 @@ public class Usuario {
 		this.login = login;
 	}
 
+	@Column(unique = false, nullable = false)
 	public String getRol() {
 		return rol;
 	}
@@ -144,6 +145,7 @@ public class Usuario {
 		this.rol = rol;
 	}
 
+	@Column(unique = false, nullable = false)
 	public String getHashedAndSalted() {
 		return hashedAndSalted;
 	}
@@ -152,6 +154,7 @@ public class Usuario {
 		this.hashedAndSalted = hashedAndSalted;
 	}
 
+	@Column(unique = false, nullable = false)
 	public String getSalt() {
 		return salt;
 	}
@@ -168,7 +171,7 @@ public class Usuario {
 		return id + " " + login + " " + email;
 	}
 
-	@Column(unique = true)
+	@Column(unique = true, nullable = false)
 	public String getEmail() {
 		return email;
 	}
@@ -177,6 +180,7 @@ public class Usuario {
 		this.email = email;
 	}
 
+	@Column(unique = false, nullable = false)
 	public double getPuntos() {
 		return puntos;
 	}
@@ -187,6 +191,7 @@ public class Usuario {
 
 	@OneToMany(targetEntity = Partida.class)
 	@JoinColumn(name = "user_id")
+	@Column(unique = false, nullable = true)
 	public List<Partida> getPartidas() {
 		return partidas;
 	}

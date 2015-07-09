@@ -1,44 +1,91 @@
 package es.ucm.reinvasion.model;
 
+import java.util.List;
+
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 
-public abstract class ServicioAplicacionUsuario {
+import org.springframework.transaction.annotation.Transactional;
 
+public class ServicioAplicacionUsuario {
+	@Transactional
 	public static Usuario create(EntityManager entityManager, String username,
 			String email, String pass) {
-		Usuario u = null;
+
 		try {
-			// Se comprueba que el username no está ya registrado
-			u = (Usuario) entityManager.createNamedQuery("usuarioByLogin")
-					.setParameter("loginParam", username).getSingleResult();
-			u = (Usuario) entityManager.createNamedQuery("usuarioByEmail")
-					.setParameter("emailParam", email).getSingleResult();
-			return null;
-		} catch (NoResultException exception) {
 			Usuario user = Usuario.createUser(username, email, pass, "user");
 			entityManager.persist(user);
 			return user;
-
+		} catch (NoResultException exception) {
+			exception.printStackTrace();
+			return null;
 		}
-
 	}
 
-	public static Usuario read(EntityManager entityManager, String username) {
+	@Transactional
+	public static boolean deleteByUsername(EntityManager entityManager,
+			String username) {
+		try {
+			Usuario u = readByUsername(entityManager, username);
+			if (u != null)
+				return (entityManager.createNamedQuery("delUsuario")
+						.setParameter("idParam", u.getId()).executeUpdate() == 1);
+			else
+				return false;
+		} catch (NoResultException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	@Transactional
+	public static Usuario readById(EntityManager entityManager, long id) {
+		Usuario u = (Usuario) entityManager.find(Usuario.class, id);
+		return u;
+	}
+
+	@Transactional
+	public static Usuario readByUsername(EntityManager entityManager,
+			String username) {
 		try {
 			return (Usuario) entityManager.createNamedQuery("usuarioByLogin")
 					.setParameter("loginParam", username).getSingleResult();
 		} catch (NoResultException exception) {
+			exception.printStackTrace();
 			return null;
 		}
 	}
-	
-	public static Usuario update(EntityManager entityManager, Usuario usuario, String email, String pass){
-		return null;
+
+	@Transactional
+	public static Usuario update(EntityManager entityManager, Usuario usuario,
+			String email, String pass) {
+		if (entityManager.contains(usuario)) {
+			usuario.setEmail(email);
+			usuario.setHashedAndSalted(Usuario.generateHashedAndSalted(pass,
+					usuario.getSalt()));
+			entityManager.persist(usuario);
+			return usuario;
+		} else {
+			return null;
+		}
 	}
-	public static Usuario delete(EntityManager entityManager, long id){
-		Usuario u = (Usuario) entityManager.createNamedQuery("delUsuario").setParameter("idParam", id).getSingleResult();
+
+	@Transactional
+	public static Usuario delete(EntityManager entityManager, long id) {
+		Usuario u = (Usuario) entityManager.createNamedQuery("delUsuario")
+				.setParameter("idParam", id).getSingleResult();
 		return null;
 	}
 
+	public static List<Usuario> readAll(EntityManager entityManager) {
+		try {
+			List<Usuario> list = entityManager.createQuery(
+					"select u.login, u.puntos from Usuario u").getResultList();
+			return list;
+		} catch (NoResultException e) {
+			e.printStackTrace();
+			return null;
+		}
+
+	}
 }

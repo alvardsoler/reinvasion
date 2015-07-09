@@ -21,8 +21,10 @@
 								success : function(data) {
 									console.log("ok");
 									alert("ok");
-									if (data.res == "YES")
+									if (data.res == "YES"){
 										console.log("ok");
+										window.location.href = "login.html";
+									}
 									else {
 										console.log("nop");
 									}

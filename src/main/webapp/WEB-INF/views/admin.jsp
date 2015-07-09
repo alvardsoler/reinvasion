@@ -3,15 +3,39 @@
 	<br />
 	<div id="text">
 
-		<c:if test="${role != 'admin' }">
-			<c:redirect url="/"></c:redirect>
-		</c:if>
+		<%-- 		<c:if test="${usuario.rol != 'admin' }"> --%>
+		<%-- 			<c:redirect url="/"></c:redirect> --%>
+		<%-- 		</c:if> --%>
 		<h1>ADMIN</h1>
-
+		<div id="delete">
+			<label>Usuario para borrar: </label><input type="text" id="nameDel" />
+			<input type="button" id="btnDel" value="Eliminar" />
+		</div>
 		<div id="tablaUsuarios"></div>
 		<div id="tablaPartidas"></div>
 		<script type="text/javascript">
 			$(document).ready(function() {
+				$('#btnDel').click(function() {
+					var username = $('#nameDel').val();
+					$.ajax({
+						method : "POST",
+						url : "${prefix}delUser",
+						data : {
+							username : username,
+						},
+						dataType : "json",
+						success : function(data) {
+							console.log("ok");
+							alert("ok");
+							if (data.res == "YES") {
+								alert("Usuario eliminad");
+							} else {
+								alert("Error al eliminar el usuario");
+							}
+						}
+
+					});
+				});
 				$('#tablaUsuarios').jtable({
 					title : 'Usuarios',
 					paging : true,
@@ -39,7 +63,7 @@
 						Email : {
 							title : 'Email',
 							width : '20%'
-						},												
+						},
 						Puntos : {
 							title : 'Puntos',
 							width : '20%'

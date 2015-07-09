@@ -1,11 +1,13 @@
 package es.ucm.reinvasion;
 
+import java.util.List;
+
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import org.springframework.transaction.annotation.Transactional;
 
+import org.springframework.transaction.annotation.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -66,11 +68,31 @@ public class HomeController {
 		if (u != null && u.isPassValid(pass)) {
 			logger.info("ok");
 			session.setAttribute("usuario", u);
-			return "{\"res\": \"YES\", \"to\": \"" + u.getLogin() + "\"}";
+			if (isAdmin(session))
+				return "{\"res\": \"YES\", \"to\": \"admin\"}";
+			else
+				return "{\"res\": \"YES\", \"to\": \"" + u.getLogin() + "\"}";
 		} else {
 			logger.warn("nope");
 			return "{\"res\": \"NOPE\"}";
 		}
+	}
+
+	@RequestMapping(value = "/delUser", method = RequestMethod.POST)
+	@Transactional
+	@ResponseBody
+	public String delUser(@RequestParam("username") String username,
+			HttpServletRequest request, Model mode, HttpSession session) {
+		logger.info("Intentando eliminar el usuario {}", username);
+		if (isAdmin(session)) {
+			ServicioAplicacionUsuario sau = new ServicioAplicacionUsuario();
+			if (sau.deleteByUsername(entityManager, username)) {
+				return "{\"res\": \"YES\"}";
+			} else
+				return "{\"res\": \"NOPE\"}";
+		} else
+			return "{\"res\": \"NOPE\"}";
+
 	}
 
 	/* Funciones de carga de páginas */
@@ -108,7 +130,10 @@ public class HomeController {
 	public String userView(@PathVariable("username") String username,
 			Model model) {
 		logger.info("VIEW: Cargando el usuario {}", username);
-		model.addAttribute("userViewed", entityManager.createNamedQuery("usuarioByLogin").setParameter("loginParam", username).getSingleResult());
+		model.addAttribute(
+				"userViewed",
+				entityManager.createNamedQuery("usuarioByLogin")
+						.setParameter("loginParam", username).getSingleResult());
 		model.addAttribute("prefix", "../");
 		model.addAttribute("pageTitle", "Usuario - Invasion Strategy Game");
 
@@ -127,8 +152,18 @@ public class HomeController {
 	public String rankingView(Model model) {
 		logger.info("VIEW: Cargando el ranking");
 		model.addAttribute("pageTitle", "Ranking - Invasion Strategy Game");
-
 		return "ranking";
+	}
+
+	@ResponseBody
+	@RequestMapping(value = "/loadRanking", method = RequestMethod.GET)
+	public String loadRanking(Model model) {
+		ServicioAplicacionUsuario sau = new ServicioAplicacionUsuario();
+		List<Usuario> list = sau.readAll(entityManager);
+		logger.info("Loading ranking... with {} elems", list.size());
+		Gson gson = new Gson();
+		return gson.toJson(list);
+
 	}
 
 	@RequestMapping(value = "/admin", method = RequestMethod.GET)
@@ -162,7 +197,7 @@ public class HomeController {
 	 * Returns true if the user is logged in and is an admin
 	 */
 	static boolean isAdmin(HttpSession session) {
-		Usuario u = (Usuario) session.getAttribute("user");
+		Usuario u = (Usuario) session.getAttribute("usuario");
 		if (u != null) {
 			return u.getRol().equals("admin");
 		} else {
