@@ -72,7 +72,6 @@ position: absolute;
 }
 
 #menu {
-	width: 100%;
 	background: #49000E;
 	height: 17px;
 	margin-right: auto;
@@ -162,11 +161,16 @@ a:hover {
 
 #submit {
 	text-align:center;
+	margin-top: 10%;
+	
 }
 
 #submit1 {
-	margin-top: -1em;
-	margin-left: 9em;
+	margin-left: 5%;
+}
+
+#submit2 {
+	text-align:center;
 }
 
 .center {
@@ -180,16 +184,38 @@ a:hover {
 	color: red;
 }
 
-#tablaPartidas table, tr, td{
+table.listaPartidas, table.ranking{
+	border: 2px solid blue;
+	margin-left: 5%;
+	text-align: center;
 	margin-top: 2em;
 	border-collapse: collapse;
-	border: 1px solid white;
+}
+
+table.listaPartidas td {
+	border: 1px solid blue;
+	margin: 0;
+	padding-right: 22em;
+	padding-bottom: 1em;
+	padding-top: 1 em;
+}
+
+table.ranking td{
+	border: 1px solid blue;
+	margin: 0;
+	padding-right: 15em;
+	padding-bottom: 1em;
+	padding-top: 1 em;
 }
 
 #tableRanking table, tr, td{
 	margin-top: 2em;
 	border-collapse: collapse;
 	border: 1px solid white;
+}
+
+#nombrePartida{
+	margin-left: 5%;
 }
 
 fieldset {

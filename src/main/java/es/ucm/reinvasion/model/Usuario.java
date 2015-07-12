@@ -2,11 +2,13 @@ package es.ucm.reinvasion.model;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -46,6 +48,7 @@ public class Usuario {
 		u.salt = byteArrayToHexString(saltBytes);
 		u.hashedAndSalted = generateHashedAndSalted(pass, u.salt);
 		u.rol = rol;
+		u.partidas = new LinkedList<Partida>();
 		return u;
 	}
 
@@ -189,7 +192,7 @@ public class Usuario {
 		this.puntos = puntos;
 	}
 
-	@OneToMany(targetEntity = Partida.class)
+	@OneToMany(targetEntity = Partida.class, fetch=FetchType.EAGER)
 	@JoinColumn(name = "user_id")
 	@Column(unique = false, nullable = true)
 	public List<Partida> getPartidas() {

@@ -1,11 +1,15 @@
 package es.ucm.reinvasion;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.transaction.annotation.Transactional;
@@ -20,7 +24,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.reflect.TypeToken;
 
+import es.ucm.reinvasion.model.Partida;
+import es.ucm.reinvasion.model.ServicioAplicacionPartida;
 import es.ucm.reinvasion.model.ServicioAplicacionUsuario;
 import es.ucm.reinvasion.model.Usuario;
 
@@ -51,6 +60,7 @@ public class HomeController {
 		if (pass.equals(pass2)) {
 			Usuario u = ServicioAplicacionUsuario.create(entityManager,
 					username, email, pass);
+		
 			if (u != null) {
 				session.setAttribute("usuario", u);
 				return "{\"res\": \"YES\"}";
@@ -145,9 +155,18 @@ public class HomeController {
 	public String partidasView(@PathVariable("username") String username,
 			Model model) {
 		logger.info("VIEW: Cargando las partidas del usuario {}", username);
+			
+		List<Partida> p = new LinkedList<Partida>();
+		ServicioAplicacionPartida sap = new ServicioAplicacionPartida();
+		for(int i=0; i< sap.readAllByUser(entityManager, username).size();i++){
+			p.add(sap.readAllByUser(entityManager, username).get(i));
+		};
 		model.addAttribute("prefix", "../");
 		model.addAttribute("pageTitle", "Partidas - Invasion Strategy Game");
+		model.addAttribute("partidas",p);
+		
 		return "partidas";
+
 	}
 
 	@RequestMapping(value = "/usuario/{username}", method = RequestMethod.GET)
@@ -155,7 +174,7 @@ public class HomeController {
 			Model model) {
 		logger.info("VIEW: Cargando el usuario {}", username);
 		model.addAttribute(
-				"userViewed",
+				"userView",
 				entityManager.createNamedQuery("usuarioByLogin")
 						.setParameter("loginParam", username).getSingleResult());
 		model.addAttribute("prefix", "../");
@@ -175,6 +194,11 @@ public class HomeController {
 	@RequestMapping(value = "/ranking", method = RequestMethod.GET)
 	public String rankingView(Model model) {
 		logger.info("VIEW: Cargando el ranking");
+		List<Usuario> usuarios = new LinkedList<Usuario>();
+		ServicioAplicacionUsuario sau = new ServicioAplicacionUsuario();
+		logger.info("El tamaño del array de usuarios es igual a: " + sau.readAll(entityManager).size());
+		usuarios = sau.readAll(entityManager);
+		model.addAttribute("allUsers",usuarios);
 		model.addAttribute("pageTitle", "Ranking - Invasion Strategy Game");
 		return "ranking";
 	}
@@ -213,6 +237,35 @@ public class HomeController {
 		model.addAttribute("pageTitle", "Registro - Invasion Strategy Game");
 
 		return "registro";
+	}
+	private HashMap<String, Object> JSONROOT = new HashMap<String, Object>();
+	@ResponseBody
+	@RequestMapping(value = "/InvasionServlet")
+	@Transactional
+	public void loadData(@RequestParam("action") String action,
+			HttpServletResponse response, HttpServletRequest request)
+			throws IOException {
+		
+		if (action != null) {
+			Gson gson = new Gson();
+			// logger.info(request.getParameterMap().toString());
+			response.setContentType("application/json");
+			if (action.equals("listAllUsers")) {
+				
+				logger.info("cargando ranking de usuarios");
+				List<Usuario> usuarios = entityManager.createQuery(
+						"Select u.id, u.login, u.rol, u.email, u.puntos From Usuario u")
+						.getResultList();
+				
+				JSONROOT.put("Result", "OK");
+				JSONROOT.put("Records", usuarios);
+
+				String array = gson.toJson(JSONROOT);
+				logger.info("***El array contiene: " + array);
+				response.getWriter().print(gson.toJson(JSONROOT));
+				
+			}
+		}
 	}
 
 	/* Funciones auxiliares */

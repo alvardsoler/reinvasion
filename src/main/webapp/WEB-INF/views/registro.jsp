@@ -125,7 +125,7 @@
 					</tr>
 				</table>
 				<br />
-				<div id="submit">
+				<div id="submit2">
 					<button class="regUser">Registrar</button>
 				</div>
 			</fieldset>

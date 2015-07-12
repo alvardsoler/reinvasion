@@ -47,30 +47,32 @@
 						deleteAction : 'InvasionServlet?action=deleteUser'
 					},
 					fields : {
-						UserID : {
+						id : {
+							title: 'UserId',
 							key : true,
-							list : false
+							list : true,
+							width: '3%'
 						},
-						Username : {
-							title : 'Username',
+						login : {
+							title : 'UserName',
 							width : '10%'
 						},
-						Rol : {
+						rol : {
 							title : 'Rol',
 							width : '5%'
 						},
-						Email : {
+						email : {
 							title : 'Email',
 							width : '20%'
 						},
-						Puntos : {
+						puntos : {
 							title : 'Puntos',
 							width : '20%'
 						}
 					}
 				});
 
-				$('#tablaPartidas').jtable({
+				/* $('#tablaPartidas').jtable({
 					title : "Partidas",
 					paging : true,
 					selecting : true,
@@ -114,12 +116,14 @@
 							type : 'date',
 							displayFormat : 'dd-mm-yy'
 						}
-
 					}
 
+					
+
 				});
+			 */
 				$('#tablaUsuarios').jtable('load');
-				$('#tablaPartidas').jtable('load');
+				//$('#tablaPartidas').jtable('load');
 			});
 		</script>
 

@@ -2,6 +2,7 @@ package es.ucm.reinvasion.model;
 
 import java.io.IOException;
 import java.util.Calendar;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -17,13 +18,15 @@ import javax.persistence.NamedQuery;
 import com.google.gson.Gson;
 
 import es.ucm.reinvasion.juego.JuegoPartida;
+import es.ucm.reinvasion.juego.Jugador;
 import es.ucm.reinvasion.juego.LeerMapa;
 
 @Entity
 @NamedQueries({
 		@NamedQuery(name = "partidaById", query = "select p from Partida p where p.id = :idParam"),
 		@NamedQuery(name = "partidaByNombre", query = "select p from Partida p where p.nombre = :nombreParam"),
-		@NamedQuery(name = "partidaByCreador", query = "select p from Partida p where p.creador =:creadorParam") })
+		@NamedQuery(name = "partidaByCreador", query = "select p from Partida p where p.creador =:creadorParam"),
+		@NamedQuery(name = "delPartida", query = "delete from Partida p where p.id = :idParam")})
 public class Partida {
 	public enum EstadoPartida {
 		ESPERANDO, EN_CURSO, FINALIZADA;
@@ -47,6 +50,7 @@ public class Partida {
 		p.creador = creador;
 		p.fechaInicio = fechaInicio;
 		p.estado = EstadoPartida.ESPERANDO;
+		p.jugadores = new LinkedList<>();
 		return p;
 	}
 
@@ -116,6 +120,10 @@ public class Partida {
 
 	public void setJugadores(List<Long> jugadores) {
 		this.jugadores = jugadores;
+	}
+	
+	public void addJugador(Jugador j){
+		this.jugadores.add((long) j.getId());
 	}
 
 	@ManyToOne(targetEntity = Usuario.class)

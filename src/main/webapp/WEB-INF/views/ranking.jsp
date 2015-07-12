@@ -6,40 +6,16 @@
 		<!-- Comienzo de la tabla del ranking -->
 
 		<div id="tableRanking" class="center"></div>
-		<script type="text/javascript">
-			$(document).ready(function() {
-				// 				$('#tableRanking').jtable({
-				// 					title : 'Ranking de usuarios',
-
-				// 					actions : {
-				// 						listAction : 'InvasionServlet?action=listRanking'
-				// 					},
-				// 					fields : {
-				// 						UserID : {
-				// 							key : true,
-				// 							list : false
-				// 						},
-				// 						Username : {
-				// 							title : 'Username',
-				// 							width : '20%'
-				// 						},
-				// 						Puntos : {
-				// 							title : 'Puntos',
-				// 							width : '20%'
-				// 						}
-				// 					}
-				// 				});
-				// 				$('#tableRanking').jtable('load');
-				$.ajax({
-					method : "GET",
-					url : "${prefix}loadRanking",
-					dataType : "json",
-					success : function(data) {
-						console.log(data);
-					}
-				});
-			});
-		</script>
+		<table class= "ranking">
+			<thead>
+					<tr><td>UserId<td>Username<td>Puntos</tr>
+			</thead>
+			<tbody>
+				<c:forEach items="${allUsers}" var = "users">
+					<tr><td>${users.id} <td> ${users.login} <td>${users.puntos}</tr>
+				</c:forEach>
+			</tbody>
+		</table>
 	</div>
 
 	<div class="end"></div>

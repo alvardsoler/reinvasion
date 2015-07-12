@@ -84,7 +84,7 @@ public class ServicioAplicacionUsuario {
 	public static List<Usuario> readAll(EntityManager entityManager) {
 		try {
 			List<Usuario> list = entityManager.createQuery(
-					"select u.login, u.puntos from Usuario u").getResultList();
+					"From Usuario u").getResultList();
 			return list;
 		} catch (NoResultException e) {
 			e.printStackTrace();
