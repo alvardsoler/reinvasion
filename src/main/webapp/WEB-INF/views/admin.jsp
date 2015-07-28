@@ -22,7 +22,7 @@
 						url : "${prefix}delUser",
 						data : {
 							username : username,
-							csrf: "${csrf_token}"
+							csrf : "${csrf_token}"
 						},
 						dataType : "json",
 						success : function(data) {
@@ -46,26 +46,20 @@
 						updateAction : 'InvasionServlet?action=updateUser',
 						deleteAction : 'InvasionServlet?action=deleteUser'
 					},
-					fields : {
-						id : {
-							title: 'UserId',
-							key : true,
-							list : true,
-							width: '3%'
-						},
-						login : {
+					fields : {						
+						1 : {
 							title : 'UserName',
 							width : '10%'
 						},
-						rol : {
+						2 : {
 							title : 'Rol',
 							width : '5%'
 						},
-						email : {
+						3 : {
 							title : 'Email',
 							width : '20%'
 						},
-						puntos : {
+						4 : {
 							title : 'Puntos',
 							width : '20%'
 						}
@@ -121,13 +115,13 @@
 					
 
 				});
-			 */
+				 */
 				$('#tablaUsuarios').jtable('load');
 				//$('#tablaPartidas').jtable('load');
 			});
 		</script>
 
-		
+
 		<div class="end"></div>
 	</div>
 	<%@ include file="../fragments/footer.jspf"%>

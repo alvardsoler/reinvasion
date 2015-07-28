@@ -15,8 +15,8 @@ public class Jugador {
     public Jugador(String color, int id) {
         this.id = id;
         this.color = color;
-        this.cartas = new ArrayList<>();
-        this.paisesControlados = new ArrayList<>();
+        this.cartas = new ArrayList<Carta>();
+        this.paisesControlados = new ArrayList<Integer>();
     }
 
     public Jugador(String color, int id, ArrayList<Integer> paisesControlados, ArrayList<Carta> cartas) {

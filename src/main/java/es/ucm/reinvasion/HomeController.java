@@ -1,6 +1,8 @@
 package es.ucm.reinvasion;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -12,10 +14,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.springframework.transaction.annotation.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,14 +26,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.reflect.TypeToken;
 
 import es.ucm.reinvasion.model.Partida;
 import es.ucm.reinvasion.model.ServicioAplicacionPartida;
 import es.ucm.reinvasion.model.ServicioAplicacionUsuario;
 import es.ucm.reinvasion.model.Usuario;
+import es.ucm.reinvasion.model.UsuarioPartidaId;
+import es.ucm.reinvasion.model.Usuario_Partida;
 
 /**
  * Handles requests for the application home page.
@@ -60,7 +61,7 @@ public class HomeController {
 		if (pass.equals(pass2)) {
 			Usuario u = ServicioAplicacionUsuario.create(entityManager,
 					username, email, pass);
-		
+
 			if (u != null) {
 				session.setAttribute("usuario", u);
 				return "{\"res\": \"YES\"}";
@@ -69,6 +70,51 @@ public class HomeController {
 		} else
 			return "{\"res\": \"NOPE\",\"msg\": \"Las claves no coinciden\"}";
 		return "{\"res\": \"NOPE\",\"msg\": \"Algún error al crear el usuario\"}";
+	}
+
+	@RequestMapping(value = "/nuevaPartida", method = RequestMethod.POST)
+	@ResponseBody
+	@Transactional
+	public String newPartida(@RequestParam("nombrePartida") String nPartida,
+			HttpServletRequest request, Model model, HttpSession session) {
+
+		Usuario u = (Usuario) session.getAttribute("usuario");
+
+		Partida p = ServicioAplicacionPartida.create(entityManager, nPartida,
+				u, Calendar.getInstance());
+		if (p != null) {
+			return jsonOK;
+		} else
+			return jsonNO;
+
+	}
+
+	@RequestMapping(value = "/unirsePartida", method = RequestMethod.POST)
+	@ResponseBody
+	@Transactional
+	public String unirsePartida(@RequestParam("idPartida") long idPartida,
+			HttpServletRequest request, Model model, HttpSession session) {
+		Usuario u = (Usuario) session.getAttribute("usuario");
+
+		Partida p = ServicioAplicacionPartida.getPartida(entityManager,
+				idPartida);
+		if (p.getEstado() == Partida.EstadoPartida.ESPERANDO) {
+			List<Partida> lp = (List<Partida>) entityManager
+					.createNamedQuery("isUserInPartida")
+					.setParameter("idUser", u.getId())
+					.setParameter("idPartida", (long) idPartida)
+					.getResultList();
+			if (lp.size() == 0) { // se introduce el usuario
+				ServicioAplicacionPartida.addUserToGame(entityManager,
+						idPartida, u.getId());
+				return jsonOK;
+			} else
+				return jsonNO;// ya está dentro
+
+		} // else la partida ya ha comenzado
+		else
+			return jsonNO;
+
 	}
 
 	@RequestMapping(value = "/loginUser", method = RequestMethod.POST)
@@ -96,15 +142,21 @@ public class HomeController {
 	@RequestMapping(value = "/updateUser", method = RequestMethod.POST)
 	@Transactional
 	@ResponseBody
-	public String updateUser(@RequestParam("idUser") long idUsuario,
-			@RequestParam("emaiUser") String email,
+	public String updateUser(@RequestParam("username") String username,
+			@RequestParam("emailUser") String email,
 			@RequestParam("passUser") String pass, HttpServletRequest request,
 			Model mode, HttpSession session) {
-		logger.info("Updating user {}", idUsuario);
+		logger.info("Updating user {} {} {}", username, email);
+		/*
+		 * Lo que debería hacer: Si el usuario es admin: actualizar los datos
+		 * pasados Si el usuario no es el admin: comprobar que tienen la misma
+		 * ID, que la clave es correcta y después hacer las modificaciones
+		 */
+
 		if (isAdmin(session)
-				|| ((Usuario) session.getAttribute("usuario")).getId() == idUsuario) {
+				|| ((Usuario) session.getAttribute("usuario")).getLogin() == username) {
 			ServicioAplicacionUsuario sau = new ServicioAplicacionUsuario();
-			if (sau.update(entityManager, idUsuario, email, pass) != null)
+			if (sau.update(entityManager, username, email, pass) != null)
 				return jsonOK;
 		}
 		return jsonNO;
@@ -143,7 +195,7 @@ public class HomeController {
 	}
 
 	@RequestMapping(value = "/partida/{idPartida}", method = RequestMethod.GET)
-	public String partidasView(@PathVariable("idPartida") long idPartida,
+	public String partidaView(@PathVariable("idPartida") long idPartida,
 			Model model) {
 		logger.info("VIEW: Cargando la partida {}", idPartida);
 		model.addAttribute("prefix", "../");
@@ -153,30 +205,78 @@ public class HomeController {
 
 	@RequestMapping(value = "/partidas/{username}", method = RequestMethod.GET)
 	public String partidasView(@PathVariable("username") String username,
-			Model model) {
+			Model model, HttpSession session) {
 		logger.info("VIEW: Cargando las partidas del usuario {}", username);
-			
-		List<Partida> p = new LinkedList<Partida>();
-		ServicioAplicacionPartida sap = new ServicioAplicacionPartida();
-		for(int i=0; i< sap.readAllByUser(entityManager, username).size();i++){
-			p.add(sap.readAllByUser(entityManager, username).get(i));
-		};
+
+		List<Usuario_Partida> partidasUsuario = new ArrayList<Usuario_Partida>();
+		Usuario u = (Usuario) session.getAttribute("usuario");
+
+		// ServicioAplicacionPartida sap = new ServicioAplicacionPartida();
+
+		// p = sap.readAllByUserIn(entityManager, u);
+		partidasUsuario = entityManager.createNamedQuery("partidasUsuario")
+				.setParameter("idUser", u.getId()).getResultList();
+
+		List<Partida> ret = new ArrayList<Partida>();
+
+		if (partidasUsuario.size() > 0) {
+			for (int i = 0; i < partidasUsuario.size(); i++) {
+				UsuarioPartidaId id = partidasUsuario.get(i).getId();
+				ret.add(ServicioAplicacionPartida.getPartida(entityManager,
+						id.getIdPartida()));
+			}
+			model.addAttribute("partidasUnido", ret);
+		}
+
+		// List<Partida> resto =
+		// ServicioAplicacionPartida.readAll(entityManager);
+		List<Partida> resto = ServicioAplicacionPartida.readAllWithoutUser(
+				entityManager, u.getId());
+		List<Partida> noUnido = new ArrayList<Partida>();
+
+		if (resto.size() > 0) {
+			for (int i = 0; i < resto.size(); i++) {
+				boolean found = false;
+				for (int j = 0; j < ret.size() && !found; j++) {
+					if (ret.get(j).getId().equals(resto.get(i).getId())) {
+						found = true;
+					}
+				}
+
+				if (!found) {
+					noUnido.add(resto.get(i));
+				}
+			}
+		}
+		model.addAttribute("restoPartidas", noUnido);
+
+		// for (int i = 0; i < sap.readAllByUser(entityManager,
+		// username).size(); i++) {
+		// p.add(sap.readAllByUser(entityManager, username).get(i));
+		// }
+		logger.info("Loading partidas from {}", username);
+		logger.info("Values: {}", partidasUsuario);
+
 		model.addAttribute("prefix", "../");
 		model.addAttribute("pageTitle", "Partidas - Invasion Strategy Game");
-		model.addAttribute("partidas",p);
-		
-		return "partidas";
 
+		return "partidas";
 	}
 
+	@Transactional
 	@RequestMapping(value = "/usuario/{username}", method = RequestMethod.GET)
 	public String userView(@PathVariable("username") String username,
 			Model model) {
 		logger.info("VIEW: Cargando el usuario {}", username);
-		model.addAttribute(
-				"userView",
-				entityManager.createNamedQuery("usuarioByLogin")
-						.setParameter("loginParam", username).getSingleResult());
+		ServicioAplicacionUsuario sau = new ServicioAplicacionUsuario();
+		Usuario u = sau.readByUsername(entityManager, username);
+		// Usuario u = (Usuario)
+		// entityManager.createNamedQuery("usuarioByLogin")
+		// .setParameter("loginParam", username).getSingleResult();
+		if (u != null)
+			model.addAttribute("userView", u);
+		else
+			logger.warn("No data for {}", username);
 		model.addAttribute("prefix", "../");
 		model.addAttribute("pageTitle", "Usuario - Invasion Strategy Game");
 
@@ -196,9 +296,10 @@ public class HomeController {
 		logger.info("VIEW: Cargando el ranking");
 		List<Usuario> usuarios = new LinkedList<Usuario>();
 		ServicioAplicacionUsuario sau = new ServicioAplicacionUsuario();
-		logger.info("El tamaño del array de usuarios es igual a: " + sau.readAll(entityManager).size());
+		logger.info("El tamaño del array de usuarios es igual a: "
+				+ sau.readAll(entityManager).size());
 		usuarios = sau.readAll(entityManager);
-		model.addAttribute("allUsers",usuarios);
+		model.addAttribute("allUsers", usuarios);
 		model.addAttribute("pageTitle", "Ranking - Invasion Strategy Game");
 		return "ranking";
 	}
@@ -238,32 +339,35 @@ public class HomeController {
 
 		return "registro";
 	}
+
 	private HashMap<String, Object> JSONROOT = new HashMap<String, Object>();
+
 	@ResponseBody
 	@RequestMapping(value = "/InvasionServlet")
 	@Transactional
 	public void loadData(@RequestParam("action") String action,
 			HttpServletResponse response, HttpServletRequest request)
 			throws IOException {
-		
+
 		if (action != null) {
 			Gson gson = new Gson();
 			// logger.info(request.getParameterMap().toString());
 			response.setContentType("application/json");
 			if (action.equals("listAllUsers")) {
-				
+
 				logger.info("cargando ranking de usuarios");
-				List<Usuario> usuarios = entityManager.createQuery(
-						"Select u.id, u.login, u.rol, u.email, u.puntos From Usuario u")
+				List<Usuario> usuarios = entityManager
+						.createQuery(
+								"Select u.id, u.login, u.rol, u.email, u.puntos From Usuario u")
 						.getResultList();
-				
+
 				JSONROOT.put("Result", "OK");
 				JSONROOT.put("Records", usuarios);
 
 				String array = gson.toJson(JSONROOT);
 				logger.info("***El array contiene: " + array);
 				response.getWriter().print(gson.toJson(JSONROOT));
-				
+
 			}
 		}
 	}

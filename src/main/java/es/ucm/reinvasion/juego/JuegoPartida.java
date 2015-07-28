@@ -125,8 +125,8 @@ public class JuegoPartida {
 			dados = Dado.tirarDados(atacante.getUnidades(),
 					defensor.getUnidades());
 
-			ArrayList<Integer> tiradasAtacante = new ArrayList<>();
-			ArrayList<Integer> tiradasDefensa = new ArrayList<>();
+			ArrayList<Integer> tiradasAtacante = new ArrayList<Integer>();
+			ArrayList<Integer> tiradasDefensa = new ArrayList<Integer>();
 
 			for (int i = 0; i < dados[0]; i++) {
 				resultAtacante = tirarDado();

@@ -18,7 +18,7 @@ public class Pais {
     }
 
     public Pais(int propietario, int id) {
-        this.paisesFrontera = new ArrayList<>();
+        this.paisesFrontera = new ArrayList<Integer>();
         this.propietario = propietario;
         this.unidades = 1;
         this.id = id;

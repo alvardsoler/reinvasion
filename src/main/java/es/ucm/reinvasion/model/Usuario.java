@@ -29,8 +29,7 @@ public class Usuario {
 	private String rol;
 	private String hashedAndSalted;
 	private String salt;
-	private double puntos;
-	private List<Partida> partidas;
+	private double puntos;	
 
 	public Usuario() {
 	}
@@ -47,8 +46,7 @@ public class Usuario {
 		r.nextBytes(saltBytes);
 		u.salt = byteArrayToHexString(saltBytes);
 		u.hashedAndSalted = generateHashedAndSalted(pass, u.salt);
-		u.rol = rol;
-		u.partidas = new LinkedList<Partida>();
+		u.rol = rol;	
 		return u;
 	}
 
@@ -190,16 +188,5 @@ public class Usuario {
 
 	public void setPuntos(double puntos) {
 		this.puntos = puntos;
-	}
-
-	@OneToMany(targetEntity = Partida.class, fetch=FetchType.EAGER)
-	@JoinColumn(name = "user_id")
-	@Column(unique = false, nullable = true)
-	public List<Partida> getPartidas() {
-		return partidas;
-	}
-
-	public void setPartidas(List<Partida> partidas) {
-		this.partidas = partidas;
 	}
 }

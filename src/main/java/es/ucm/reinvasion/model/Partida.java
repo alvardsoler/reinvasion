@@ -1,16 +1,16 @@
 package es.ucm.reinvasion.model;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Calendar;
-import java.util.LinkedList;
-import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -18,7 +18,6 @@ import javax.persistence.NamedQuery;
 import com.google.gson.Gson;
 
 import es.ucm.reinvasion.juego.JuegoPartida;
-import es.ucm.reinvasion.juego.Jugador;
 import es.ucm.reinvasion.juego.LeerMapa;
 
 @Entity
@@ -26,7 +25,10 @@ import es.ucm.reinvasion.juego.LeerMapa;
 		@NamedQuery(name = "partidaById", query = "select p from Partida p where p.id = :idParam"),
 		@NamedQuery(name = "partidaByNombre", query = "select p from Partida p where p.nombre = :nombreParam"),
 		@NamedQuery(name = "partidaByCreador", query = "select p from Partida p where p.creador =:creadorParam"),
-		@NamedQuery(name = "delPartida", query = "delete from Partida p where p.id = :idParam")})
+		// @NamedQuery(name = "partidaConUsuario", query =
+		// "select p from Partida p where p.jugadores IN (:idUser)"),
+		@NamedQuery(name = "delPartida", query = "delete from Partida p where p.id = :idParam"),
+		@NamedQuery(name = "allPartidas", query = "select p from Partida p where p.estado = :estado") })
 public class Partida {
 	public enum EstadoPartida {
 		ESPERANDO, EN_CURSO, FINALIZADA;
@@ -34,7 +36,6 @@ public class Partida {
 
 	private Long id;
 	private String nombre;
-	private List<Long> jugadores;
 	private Usuario creador;
 	private EstadoPartida estado;
 	private Calendar fechaInicio;
@@ -50,7 +51,7 @@ public class Partida {
 		p.creador = creador;
 		p.fechaInicio = fechaInicio;
 		p.estado = EstadoPartida.ESPERANDO;
-		p.jugadores = new LinkedList<>();
+		
 		return p;
 	}
 
@@ -66,14 +67,15 @@ public class Partida {
 	 * @return
 	 * @throws IOException
 	 */
-	public boolean addJugador(Long jugador) throws IOException {
+	public boolean addJugador(Usuario nuevoUsuario) throws IOException {
 		if (this.estado == EstadoPartida.ESPERANDO) {
-			this.jugadores.add(jugador);
-			if (this.jugadores.size() == MAX_JUGADORES) {
-				this.estado = EstadoPartida.EN_CURSO;
-				inicializarPartida();
-			}
-			return true;
+			// this.jugadores.add(nuevoUsuario);
+			// if (this.jugadores.size() == MAX_JUGADORES) {
+			// this.estado = EstadoPartida.EN_CURSO;
+			// inicializarPartida();
+			// }
+			// return true;
+
 		}
 		return false;
 	}
@@ -82,15 +84,16 @@ public class Partida {
 
 	public void inicializarPartida() throws IOException {
 		JuegoPartida jp = new JuegoPartida();
-		for (Long j : jugadores) {
-			jp.addJugador(colores[jugadores.size() - 1]);
-		}
+		// for (Usuario j : jugadores) {
+		// jp.addJugador(colores[jugadores.size() - 1]);
+		// }
 		LeerMapa mapa = new LeerMapa("Mapa");
 		mapa.inicializarMapa(jp);
 		mapa.asignarJugadoresPaises(jp);
 		Gson gson = new Gson();
 		json = gson.toJson(jp, JuegoPartida.class);
-		if (estado != EstadoPartida.EN_CURSO) // por si la partida comienza antes de llegar al máximo
+		if (estado != EstadoPartida.EN_CURSO) // por si la partida comienza
+												// antes de llegar al máximo
 			estado = EstadoPartida.EN_CURSO;
 	}
 
@@ -105,6 +108,7 @@ public class Partida {
 		this.id = id;
 	}
 
+	@Column(unique = false, nullable = false)
 	public String getNombre() {
 		return nombre;
 	}
@@ -113,20 +117,17 @@ public class Partida {
 		this.nombre = nombre;
 	}
 
-	@ManyToMany(targetEntity = Usuario.class, fetch = FetchType.EAGER)
-	public List<Long> getJugadores() {
-		return jugadores;
-	}
+	// @ManyToMany(targetEntity = Usuario.class, fetch = FetchType.LAZY)
+	// @JoinColumn(name = "partida_id")
+	// public List<Usuario> getJugadores() {
+	// return jugadores;
+	// }
+	//
+	// public void setJugadores(List<Usuario> jugadores) {
+	// this.jugadores = jugadores;
+	// }
 
-	public void setJugadores(List<Long> jugadores) {
-		this.jugadores = jugadores;
-	}
-	
-	public void addJugador(Jugador j){
-		this.jugadores.add((long) j.getId());
-	}
-
-	@ManyToOne(targetEntity = Usuario.class)
+	@ManyToOne(targetEntity = Usuario.class, fetch = FetchType.LAZY)
 	public Usuario getCreador() {
 		return creador;
 	}
@@ -135,6 +136,8 @@ public class Partida {
 		this.creador = creador;
 	}
 
+	@Enumerated(EnumType.ORDINAL)
+	@Column(unique = false, nullable = false)
 	public EstadoPartida getEstado() {
 		return estado;
 	}
@@ -143,8 +146,16 @@ public class Partida {
 		this.estado = estado;
 	}
 
+	@Column(unique = false, nullable = false)
 	public Calendar getFechaInicio() {
 		return fechaInicio;
+	}
+
+	@Override
+	public String toString() {
+		return "Partida [id=" + id + ", nombre=" + nombre + ", creador="
+				+ creador + ", estado=" + estado + ", fechaInicio="
+				+ fechaInicio + "]";
 	}
 
 	public void setFechaInicio(Calendar fechaInicio) {

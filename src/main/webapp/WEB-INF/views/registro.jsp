@@ -3,35 +3,40 @@
 	$()
 			.ready(
 					function() {
-						$(".regUser").click(function() {
-							var username = $("#uname").val();
-							var email = $("#uemail").val();
-							var password = $("#upass").val();
-							var password2 = $("#upass2").val();						
-							$.ajax({
-								method : "POST",
-								url : "${prefix}registrarUsuario",
-								data : {
-									username : username,
-									email: email,
-									password : password,
-									passwordValidation: password2
-								},
-								dataType : "json",
-								success : function(data) {
-									console.log("ok");
-									alert("ok");
-									if (data.res == "YES"){
-										console.log("ok");
-										window.location.href = "login.html";
-									}
-									else {
-										console.log("nop");
-									}
-								}
+						$(".regUser")
+								.click(
+										function() {
+											var username = $("#uname").val();
+											var email = $("#uemail").val();
+											var password = $("#upass").val();
+											var password2 = $("#upass2").val();
+											$
+													.ajax({
+														method : "POST",
+														url : "${prefix}registrarUsuario",
+														data : {
+															username : username,
+															email : email,
+															password : password,
+															passwordValidation : password2
+														},
+														dataType : "json",
+														success : function(data) {
+															if (data.res == "YES") {
+																alert("¡Registrado con éxito! Redirigiendo a tus partidas...")
+																console
+																		.log("ok");
+																window.location.href = "${prefix}partidas/"
+																		+ username;
+															} else {
+																console
+																		.log("nop");
+															}
+														}
 
-							});
-						});
+													});
+											return false;
+										});
 						//validate signup form on keyup and submit
 						$("#signupForm")
 								.validate(

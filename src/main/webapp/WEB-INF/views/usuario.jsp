@@ -12,33 +12,33 @@
 					<table id="userData" class="center">
 						<tr>
 							<th>Nombre usuario:</th>
-							<th><input type="text" name="user"
-								value="${userView.login}" placeholder="Name" required /></th>
+							<th><input type="text" id="user" value="${userView.login}"
+								placeholder="Name" required /></th>
 						</tr>
 						<tr>
 							<th><br /></th>
 						</tr>
 						<tr>
 							<th>Correo electrónico:</th>
-							<th><input type="email" name="email"
-								value="${userView.email}" placeholder="Email" required /></th>
+							<th><input type="email" id="email" value="${userView.email}"
+								placeholder="Email" required /></th>
 						</tr>
 						<tr>
 							<th><br /></th>
 						</tr>
 						<tr>
 							<th>Contraseña:</th>
-							<th><input type="password" name="password" value=""
+							<th><input type="password" id="password" value=""
 								placeholder="Password" required /></th>
 						</tr>
 
 					</table>
 					<br /> <br />
 					<div id="userImage">
-						<img src="${prefix}usuario/photo?id=${userView.id}" />
+						<%-- 						<img src="${prefix}usuario/photo?id=${userView.id}" /> --%>
 					</div>
 					<div id="submit">
-						<input type="submit" name="commit" value="Modificar" />
+						<button class="updateUser">Modificar</button>
 					</div>
 				</fieldset>
 			</form>
@@ -47,13 +47,15 @@
 				$("#signupForm").validate();
 			</script>
 			<div id="submit1">
-			<form method="POST" enctype="multipart/form-data" action="${prefix}usuario">
-				<input type="file" name="photo" >
-				<input hidden="submit" name="id" value="${userView.id}" />
-				<button type="submit" name="upload" value="ok">Actualizar</button>
-			</form>
-			
+				<form method="POST" enctype="multipart/form-data"
+					action="${prefix}usuario">
+					<input type="file" name="photo"> <input hidden="submit"
+						name="id" value="${userView.id}" />
+					<button type="submit" name="upload" value="ok">Actualizar</button>
+				</form>
+
 			</div>
+			<input type="hidden" name="usuario" value="${sessionScope.usuario.id} " />
 		</c:when>
 		<c:otherwise>
 			<table id="userData" class="center">
@@ -70,12 +72,42 @@
 				</tr>
 			</table>
 			<div id="userImage">
-				<img src="${prefix}usuario/photo?id=${userViewed.id}" />
+				<%-- 				<img src="${prefix}usuario/photo?id=${userViewed.id}" /> --%>
 			</div>
 		</c:otherwise>
 	</c:choose>
 	<br /> <br />
 
+	<script type="text/javascript">
+		$(function() {
+			$(".updateUser").click(function() {
+				var emailUser = $("#email").val();
+				var username = $("#user").val();
+				var password = $("#password").val();
+				// var idUser = document.getElementsByName("usuario")[0].value.trim();
+				$.ajax({
+					method : "POST",
+					url : "${prefix}updateUser",
+					data : {
+						username : username,
+						emailUser : emailUser,
+						passUser : password
+					},
+					dataType : "json",
+					success : function(data) {
+						if (data.res == "YES") {
+							alert("ok");
+							window.location.href = "usuario/" + username;
+						} else {
+							alert("nop");
+						}
+
+					}
+				})
+			})
+
+		});
+	</script>
 
 </div>
 
