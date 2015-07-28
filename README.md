@@ -9,18 +9,18 @@
     * [] Update
     * [X] Delete
   * Partida
-    * [] Create
-    * [] Read
-    * [] Update
+    * [X] Create
+    * [X] Read
+    * [X] Update
     * [] Delete
 2. Gestión de administradores
     * [] Modificar Usuarios
     * [X] Borrar Usuarios
     * [] Modificar Partidas
     * [] Borrar Partidas
-3. Añadir gente a las partidas
+3. [X] Añadir gente a las partidas
 4. Seguridad (XSS y CSRF)
-5. Ranking de usuarios
-	Falta la vista
+5. [X] Ranking de usuarios
+	Falta ordenarlos (??)
 6. CSS nuevo para las tablas
 7. Carga dinámica de las tablas
