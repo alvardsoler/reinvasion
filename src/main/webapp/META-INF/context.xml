@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Context>  	
-    	<Resource auth="Container" 
-    		driverClassName="org.hsqldb.jdbc.JDBCDriver" 
-    		name="jdbc/demoDS" type="javax.sql.DataSource" 
-    		url="jdbc:hsqldb:mem:iw;create=true" 
-    		username="sa" password=""/>
-</Context>
+<Context>
+	<!-- <Resource auth="Container" driverClassName="org.hsqldb.jdbc.JDBCDriver" -->
+	<!-- name="jdbc/demoDS" type="javax.sql.DataSource" url="jdbc:hsqldb:hsql://localhost/iw" -->
+	<!-- username="sa" password="" /> -->
+	<Resource auth="Container" driverClassName="org.hsqldb.jdbc.JDBCDriver"
+		name="jdbc/demoDS" type="javax.sql.DataSource" url="jdbc:hsqldb:hsql://localhost/iw" 
+		username="sa" password="" />
+</Context>	
