@@ -3,9 +3,11 @@ package es.ucm.reinvasion.model;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityManager;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
@@ -52,7 +54,7 @@ public class Partida {
 		p.creador = creador;
 		p.fechaInicio = fechaInicio;
 		p.estado = EstadoPartida.ESPERANDO;
-		
+
 		return p;
 	}
 
@@ -83,12 +85,18 @@ public class Partida {
 
 	String[] colores = { "rojo", "verde", "azul" };
 
-	public void inicializarPartida() throws IOException {
+	public void inicializarPartida(EntityManager entityManager)
+			throws IOException {
 		JuegoPartida jp = new JuegoPartida();
-		// for (Usuario j : jugadores) {
-		// jp.addJugador(colores[jugadores.size() - 1]);
-		// }
-		LeerMapa mapa = new LeerMapa("Mapa");
+		if (entityManager != null) {
+			List<Usuario> jugadores = ServicioAplicacionPartida.getUsersInGame(
+					entityManager, this.id);
+
+			for (Usuario j : jugadores) {
+				jp.addJugador(colores[jugadores.size() - 1]);
+			}
+		}
+		LeerMapa mapa = new LeerMapa("mapa");
 		mapa.inicializarMapa(jp);
 		mapa.asignarJugadoresPaises(jp);
 		Gson gson = new Gson();
@@ -165,6 +173,14 @@ public class Partida {
 
 	@Column(length = 10240)
 	public String getJson() {
+
+		if (json == null)
+			try {
+				inicializarPartida(null);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		return json;
 	}
 

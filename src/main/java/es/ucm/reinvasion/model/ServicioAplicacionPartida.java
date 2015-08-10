@@ -5,6 +5,9 @@ import java.util.Calendar;
 import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
+
+
 
 public class ServicioAplicacionPartida {
 
@@ -27,6 +30,16 @@ public class ServicioAplicacionPartida {
 
 		}
 
+	}
+	
+	public static List<Usuario> getUsersInGame(EntityManager entityManager, long idPartida){
+		Query q = entityManager.createQuery("select jp from Usuario_Partida jp where partidaId = " + idPartida);
+		List<Usuario_Partida> aux = q.getResultList();
+		List<Usuario> ret = new ArrayList<Usuario>();
+		for(Usuario_Partida up : aux)
+			ret.add(ServicioAplicacionUsuario.readById(entityManager, up.getId().getIdUsuario()));
+		
+		return ret; 
 	}
 
 	public static boolean addUserToGame(EntityManager entityManager,
