@@ -6,7 +6,7 @@ $(function() {
 		borderOpacity : 0.25,
 		borderWidth : 1,
 		color : '#f4f3f0',
-		enableZoom : true,
+		enableZoom : false,
 		hoverOpacity : false,
 		hoverColor : false,
 		normalizeFunction : 'linear',
@@ -594,25 +594,24 @@ function sendInfo() {
 // idPartida = $("#idPartida").val();
 //	  
 // });
+function dibujarInfoJugadores(){
+	var div = document.getElementById('infoJugadores');
+	var json = document.getElementById('jsonPartida').value;
+	
+}
 
 function getInfo() {
+	var idPartida = document.getElementById('idPartida').value;
 	console.log(idPartida);
-	$.ajax({
-		url : "partida/" + idPartida,
-		type : 'GET',
-		dataType : 'json',		
-		contentType : 'application/json',
-		mimeType : 'application/json',
-		success : function(data) {
-			alert("win");
-			
-			// nos llega info asi q deberíamos repintar el mapa con el resultado
-			// de esto
-
-		},
-		error : function(data, status, er) {
-			alert("error: " + data + " status: " + status + " er:" + er);
-		}
+	var url = "../partida/" + idPartida;
+	$.get(url).done(function(json) {
+		dibujarInfoJugadores();
+		window.setTimeout("getInfo()", 3000);
+		
+	}).fail(function(jqxhr, textStatus, error) {
+		var err = textStatus + ", " + error;
+		console.log("Request Failed: " + err);
 	});
+
 }
- window.setTimeout("getInfo()", 3000);
+window.setTimeout("getInfo()", 3000);

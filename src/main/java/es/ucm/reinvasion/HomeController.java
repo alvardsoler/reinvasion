@@ -195,11 +195,24 @@ public class HomeController {
 	}
 
 	@RequestMapping(value = "/partida/{idPartida}", method = RequestMethod.GET)
-	public String partidaView(@PathVariable("idPartida") long idPartida,
-			Model model) {
+	public String getPartida(@PathVariable("idPartida") long idPartida,
+			Model model) throws IOException {
 		logger.info("VIEW: Cargando la partida {}", idPartida);
 		model.addAttribute("prefix", "../");
 		model.addAttribute("pageTitle", "Partida - Invasion Strategy Game");
+		logger.info("Cogiendo datos de partida {}", idPartida);
+
+		if (!model.containsAttribute("idPartida"))
+			model.addAttribute("idPartida", idPartida);
+
+		// harbria que comprobar que el usuario está en la partida
+		Partida p = ServicioAplicacionPartida.getPartida(entityManager,
+				idPartida);
+		p.inicializarPartida(entityManager);
+
+		if (p.getEstado() != Partida.EstadoPartida.ESPERANDO)
+			model.addAttribute("jsonPartida", p.getJson());
+
 		return "partida";
 	}
 
