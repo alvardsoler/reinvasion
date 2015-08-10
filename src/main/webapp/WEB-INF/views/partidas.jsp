@@ -52,13 +52,32 @@
 			dataType : "json",
 			success : function(data) {
 				console.log("ok");
+				setTimeout(function() {
+					location.reload();
+				}, 0001);
 				return null;
 			}
-		})
+		});
+	}
 
-	};
 	function accederPartida(partida) {
-		window.location.href = "${prefix}partida/" + partida;
+		$.ajax({
+			method : "POST",
+			url : "${prefix}accederPartida",
+			data : {
+				idPartida : partida
+			},
+			dataType : "json",
+			success : function(data) {
+				if (data.res == "YES") {
+					window.location.href = "${prefix}partida/" + partida;
+				}
+				else{
+					alert("No se han unido aun todos los usuarios. Espere");
+				}
+			}
+		})
+		
 	}
 </script>
 <div id="content">
@@ -86,11 +105,12 @@
 						<tr>
 							<td>${p.nombre}
 							<td>${p.estado}
-							<td><button onclick="accederPartida('${p.id}')">Acceder</button>
+							<td><button onclick="accederPartida('${p.id}')">Acceder</button> 
 						</tr>
 					</c:forEach>
 					<c:if test="${empty partidasUnido}">
 						<tr>
+							<td>---
 							<td>---
 							<td>---
 						</tr>
@@ -115,6 +135,13 @@
 								
 						</tr>
 					</c:forEach>
+					<c:if test="${empty restoPartidas}">
+						<tr>
+							<td>---
+							<td>---
+							<td>---
+						</tr>
+					</c:if>
 				</tbody>
 			</table>
 

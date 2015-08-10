@@ -5,7 +5,7 @@
 		<h1>RANKING</h1>
 		<!-- Comienzo de la tabla del ranking -->
 
-		<div id="tableRanking" class="center"></div>
+		<div id="tableRanking"></div>
 		<table class= "ranking">
 			<thead>
 					<tr><td>UserId<td>Username<td>Puntos</tr>

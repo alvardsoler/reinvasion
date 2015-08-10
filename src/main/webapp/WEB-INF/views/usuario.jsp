@@ -9,11 +9,14 @@
 		<c:when test="${username == userView.login }">
 			<form id="signupForm" method="get" action="">
 				<fieldset>
+					<div id="userImage">
+						<img src="${prefix}usuario/photo?id=${userView.id}" /> 
+					</div>
 					<table id="userData" class="center">
 						<tr>
 							<th>Nombre usuario:</th>
 							<th><input type="text" id="user" value="${userView.login}"
-								placeholder="Name" required /></th>
+								placeholder="Name" required disabled="true"/></th>
 						</tr>
 						<tr>
 							<th><br /></th>
@@ -34,9 +37,7 @@
 
 					</table>
 					<br /> <br />
-					<div id="userImage">
-						<%-- 						<img src="${prefix}usuario/photo?id=${userView.id}" /> --%>
-					</div>
+					
 					<div id="submit">
 						<button class="updateUser">Modificar</button>
 					</div>
@@ -72,7 +73,7 @@
 				</tr>
 			</table>
 			<div id="userImage">
-				<%-- 				<img src="${prefix}usuario/photo?id=${userViewed.id}" /> --%>
+				<img src="${prefix}usuario/photo?id=${userViewed.id}" /> 
 			</div>
 		</c:otherwise>
 	</c:choose>
@@ -96,10 +97,13 @@
 					dataType : "json",
 					success : function(data) {
 						if (data.res == "YES") {
-							alert("ok");
+							alert("Sus datos han sido actualizados");
 							window.location.href = "usuario/" + username;
+							setTimeout(function() {
+								location.reload();
+							}, 0001);
 						} else {
-							alert("nop");
+							alert("No se han podido actualizar los datos");
 						}
 
 					}

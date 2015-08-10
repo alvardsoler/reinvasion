@@ -89,7 +89,7 @@
 
 		<form id="signupForm" method="get" action="">
 			<fieldset>
-				<table id="userData" class="center">
+				<table id="userData1" class="center">
 					<tr>
 						<th><label for="uname">Nombre de usuario: </label></th>
 						<th><input id="uname" type="text" name="username" value=""
@@ -130,7 +130,7 @@
 					</tr>
 				</table>
 				<br />
-				<div id="submit2">
+				<div id="btnRegistrar">
 					<button class="regUser">Registrar</button>
 				</div>
 			</fieldset>

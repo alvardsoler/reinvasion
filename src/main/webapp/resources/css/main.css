@@ -150,19 +150,28 @@ a:hover {
 }
 
 #userData {
-	margin: auto;
 	text-align: left;
+    float: left;
+    margin-left: 12%;
+    margin-top: 3%;
+}
+
+#userData1{
+	text-align: left;
+    float: left;
+    margin-left: 26%;
+    margin-top: 3%;
 }
 
 #userImage {
-	margin-top: -8em;
-	margin-left: 8em;
+	float:left;
+	margin-left:13%;
+	margin-top:4%;
 }
 
 #submit {
-	text-align:center;
-	margin-top: 10%;
-	
+	text-align: center;
+    margin-top: 15%;
 }
 
 #submit1 {
@@ -173,9 +182,14 @@ a:hover {
 	text-align:center;
 }
 
+#btnRegistrar{
+	margin-top:27%;
+	margin-left: 47%;
+}
+
 .center {
-	margin-left: auto;
-	margin-right: auto;
+	margin-top: 17%;
+    margin-left: 41%;
 }
 
 #errormsg {
@@ -185,6 +199,7 @@ a:hover {
 }
 
 table.listaPartidas, table.ranking{
+	width: 93%;
 	border: 2px solid blue;
 	margin-left: 5%;
 	text-align: center;
@@ -195,17 +210,16 @@ table.listaPartidas, table.ranking{
 table.listaPartidas td {
 	border: 1px solid blue;
 	margin: 0;
-	padding-right: 22em;
 	padding-bottom: 1em;
 	padding-top: 1 em;
 }
 
 table.ranking td{
 	border: 1px solid blue;
+	padding-top: 5px;
+    padding-bottom: 5px;
 	margin: 0;
-	padding-right: 15em;
-	padding-bottom: 1em;
-	padding-top: 1 em;
+
 }
 
 #tableRanking table, tr, td{
@@ -220,4 +234,24 @@ table.ranking td{
 
 fieldset {
 	border: none;
+}
+
+table.tableAdminUsers, table.tableAdminGames {
+	width:96%;
+	margin-left:2%;
+	border: 1px solid gray;
+	font-size: small;
+	border-collapse: collapse;
+}
+
+table.tableAdminUsers td, table.tableAdminGames td {
+	border: 1px solid gray;
+	margin: 0;
+	padding: 5px;
+}
+
+#delete{
+	margin-top:3%;
+	margin-left:2%;
+	margin-bottom: 2%;
 }

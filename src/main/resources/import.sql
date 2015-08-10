@@ -1,2 +1,2 @@
 /* ( ID, EMAIL, HASHEDANDSALTED, LOGIN, PUNTOS, ROL, SALT ) */
- /*INSERT INTO USUARIO VALUES (1 , 'corre1@ucm.es', '95ff31602486cecd7db623d4598a84b7aac60a5f', 'admin',900 , 'admin', '37d602c186c2b7ea82750f0055b5ede5');
+INSERT INTO USUARIO VALUES (1 , 'corre1@ucm.es', '95ff31602486cecd7db623d4598a84b7aac60a5f', 'admin',900 , 'admin', '37d602c186c2b7ea82750f0055b5ede5');

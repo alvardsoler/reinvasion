@@ -27,9 +27,26 @@ public class ServicioAplicacionUsuario {
 			String username) {
 		try {
 			Usuario u = readByUsername(entityManager, username);
-			if (u != null)
-				return (entityManager.createNamedQuery("delUsuario")
+			
+			if (u != null ){
+				List<Partida> partidas = ServicioAplicacionPartida.readAllStarted(entityManager);
+				boolean ok = true;
+				int i=0;
+				while(i<partidas.size() && ok){
+					if(!(boolean) entityManager.createNamedQuery("isUserInPartida").setParameter("idUser", u.getId()).
+							setParameter("idPartida", partidas.get(i).getId()).getResultList().isEmpty()){
+						ok=false;
+					}
+					i++;
+				}
+				if(ok && !u.getLogin().equalsIgnoreCase("admin")){
+					return (entityManager.createNamedQuery("delUsuario")
 						.setParameter("idParam", u.getId()).executeUpdate() == 1);
+				}
+				else{
+					return false;
+				}
+			}
 			else
 				return false;
 		} catch (NoResultException e) {
@@ -64,9 +81,9 @@ public class ServicioAplicacionUsuario {
 			if (!email.equals("")) {
 				u.setEmail(email);
 			}
-//			if (!pass.equals(""))
-//				u.setHashedAndSalted(Usuario.generateHashedAndSalted(pass,
-//						u.getSalt()));
+			if (!pass.equals(""))
+				u.setHashedAndSalted(Usuario.generateHashedAndSalted(pass,
+						u.getSalt()));
 
 			entityManager.persist(u);
 			u = readById(entityManager, u.getId());
@@ -84,7 +101,7 @@ public class ServicioAplicacionUsuario {
 	public static List<Usuario> readAll(EntityManager entityManager) {
 		try {
 			List<Usuario> list = entityManager.createQuery(
-					"From Usuario u").getResultList();
+					"From Usuario u order by puntos desc").getResultList();
 			return list;
 		} catch (NoResultException e) {
 			e.printStackTrace();

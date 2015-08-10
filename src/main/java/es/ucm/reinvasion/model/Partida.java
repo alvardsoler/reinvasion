@@ -28,6 +28,7 @@ import es.ucm.reinvasion.juego.LeerMapa;
 		// @NamedQuery(name = "partidaConUsuario", query =
 		// "select p from Partida p where p.jugadores IN (:idUser)"),
 		@NamedQuery(name = "delPartida", query = "delete from Partida p where p.id = :idParam"),
+		@NamedQuery(name = "delPartidaByName", query = "delete from Partida p where p.nombre = :nombreParam"),
 		@NamedQuery(name = "allPartidas", query = "select p from Partida p where p.estado = :estado") })
 public class Partida {
 	public enum EstadoPartida {

@@ -46,7 +46,7 @@
 		<br />
 		<form id="signinForm">
 			<fieldset>
-				<table id="userData" class="center">
+				<table id="userData1" class="center">
 
 					<tr id="usernametr">
 						<th><label for="user">Nombre de usuario: </label></th>

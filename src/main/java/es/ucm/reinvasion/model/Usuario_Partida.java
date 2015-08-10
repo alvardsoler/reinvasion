@@ -8,7 +8,9 @@ import javax.persistence.NamedQuery;
 @Entity
 @NamedQueries({
 		@NamedQuery(name = "partidasUsuario", query = "select up from Usuario_Partida up where up.id.usuarioId = :idUser"),
-		@NamedQuery(name = "isUserInPartida", query = "select up from Usuario_Partida up where up.id.usuarioId = :idUser and up.id.partidaId = :idPartida")
+		@NamedQuery(name = "isUserInPartida", query = "select up from Usuario_Partida up where up.id.usuarioId = :idUser and up.id.partidaId = :idPartida"),
+		@NamedQuery(name = "numberPlayers", query = "select count(up.id.partidaId) from Usuario_Partida up where up.id.partidaId = :idPartida"),
+		@NamedQuery(name = "delUserFromPartida", query = "delete from Usuario_Partida up where up.id.partidaId = :idPartida")
 		})
 public class Usuario_Partida {
 	@EmbeddedId

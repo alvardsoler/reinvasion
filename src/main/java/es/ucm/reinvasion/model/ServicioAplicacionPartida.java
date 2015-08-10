@@ -73,10 +73,17 @@ public class ServicioAplicacionPartida {
 		return ret;
 	}
 
+	public static List<Partida> readAllStarted(EntityManager entityManager){
+		return entityManager.createNamedQuery("allPartidas").setParameter("estado", Partida.EstadoPartida.EN_CURSO).getResultList();
+	}
+	
 	public static List<Partida> readAllByUserIn(EntityManager entityManager,
 			Usuario usuario) {
 		List<Partida> ret = entityManager.createNamedQuery("partidaConUsuario")
 				.setParameter("idUser", usuario.getId()).getResultList();
+		if(ret.isEmpty()){
+			return null;
+		}
 		return ret;
 	}
 
@@ -111,9 +118,25 @@ public class ServicioAplicacionPartida {
 	}
 
 	public static Partida delete(EntityManager entityManager, Long id) {
-		Partida p = (Partida) entityManager.createNamedQuery("delPartida")
-				.setParameter("idParam", id).getSingleResult();
+		entityManager.createNamedQuery("delPartida")
+				.setParameter("idParam", id).executeUpdate();
 		return null;
+	}
+	
+	public static boolean deleteByname(EntityManager entityManager, String name){
+		Partida p = (Partida) entityManager.createNamedQuery("partidaByNombre").setParameter("nombreParam", name).getSingleResult();
+		if(p!=null){
+			System.out.println("He llegado");
+			if(p.getEstado().equals(Partida.EstadoPartida.EN_CURSO) || p.getEstado().equals(Partida.EstadoPartida.FINALIZADA)){
+				entityManager.createNamedQuery("delUserFromPartida").setParameter("idPartida", p.getId()).executeUpdate();
+				entityManager.createNamedQuery("delPartidaByName").setParameter("nombreParam", name).executeUpdate();
+				return true;
+			}
+		}
+		else{
+			return false;
+		}
+		return true;
 	}
 
 }

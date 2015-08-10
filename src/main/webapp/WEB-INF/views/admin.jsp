@@ -1,4 +1,60 @@
 <%@ include file="../fragments/header.jspf"%>
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		$('#btnDel').click(function() {
+			var username = $('#nameDel').val();
+				$.ajax({
+					method : "POST",
+					url : "${prefix}delUser",
+					data : {
+						username : username,
+						csrf : "${csrf_token}"
+					},
+					dataType : "json",
+					success : function(data) {
+						if (data.res == "YES") {
+							alert("Usuario eliminado");
+							setTimeout(function() {
+								location.reload();
+							}, 0001);
+						} else {
+							alert("Error al eliminar el usuario");
+						}
+					}
+
+				});
+			});
+		$('#btnDelPartida').click(function() {
+			var gamename = $('#nameDelPartida').val();
+				$.ajax({
+					method : "POST",
+					url : "${prefix}delGame",
+					data : {
+						gamename : gamename,
+						csrf : "${csrf_token}"
+					},
+					dataType : "json",
+					success : function(data) {
+						if (data.res == "YES") {
+							alert("Partida eliminada");
+							setTimeout(function() {
+								location.reload();
+							}, 0001);
+						} else if(data.res == "NOPEA"){
+							alert("No tiene permiso para eliminar la partida");
+						}
+						else{
+							alert("Error al eliminar la partida");
+						}
+					} 
+					
+				});
+		});
+	});
+
+</script>
+
 <div id="content">
 	<br />
 	<div id="text">
@@ -7,120 +63,52 @@
 		<%-- 			<c:redirect url="/"></c:redirect> --%>
 		<%-- 		</c:if> --%>
 		<h1>ADMIN</h1>
+		
+		<h1>Usuarios del sistema</h1>
+		<table class="tableAdminUsers">
+		<thead>
+			<tr><td>Id<td>Login<td>Rol<td>Email<td>Puntos<td>Avatar</tr>
+		</thead>
+		<tbody>
+			<c:forEach items="${users}" var="u">
+				<tr><td>${u.id}<td>${e:forHtmlContent(u.login)}<td>${u.rol}
+				<td>${u.email}<td>${u.puntos}<td><img src="usuario/photo?id=${u.id}"/>
+			</c:forEach>
+		</tbody>	
+		</table>
+
 		<div id="delete">
 			<label>Usuario para borrar: </label><input type="text" id="nameDel" />
 			<input type="button" id="btnDel" value="Eliminar" />
 		</div>
-		<div id="tablaUsuarios"></div>
-		<div id="tablaPartidas"></div>
-		<script type="text/javascript">
-			$(document).ready(function() {
-				$('#btnDel').click(function() {
-					var username = $('#nameDel').val();
-					$.ajax({
-						method : "POST",
-						url : "${prefix}delUser",
-						data : {
-							username : username,
-							csrf : "${csrf_token}"
-						},
-						dataType : "json",
-						success : function(data) {
-							if (data.res == "YES") {
-								alert("Usuario eliminado");
-							} else {
-								alert("Error al eliminar el usuario");
-							}
-						}
-
-					});
-				});
-				$('#tablaUsuarios').jtable({
-					title : 'Usuarios',
-					paging : true,
-					selecting : true,
-					sorting : true,
-					actions : {
-						listAction : 'InvasionServlet?action=listAllUsers',
-						createAction : 'InvasionServlet?action=createUser',
-						updateAction : 'InvasionServlet?action=updateUser',
-						deleteAction : 'InvasionServlet?action=deleteUser'
-					},
-					fields : {						
-						1 : {
-							title : 'UserName',
-							width : '10%'
-						},
-						2 : {
-							title : 'Rol',
-							width : '5%'
-						},
-						3 : {
-							title : 'Email',
-							width : '20%'
-						},
-						4 : {
-							title : 'Puntos',
-							width : '20%'
-						}
-					}
-				});
-
-				/* $('#tablaPartidas').jtable({
-					title : "Partidas",
-					paging : true,
-					selecting : true,
-					sorting : true,
-					actions : {
-						listAction : 'InvasionServlet?action=listAllPartidas',
-						createAction : 'InvasionServlet?action=createPartida',
-						updateAction : 'InvasionServlet?action=updatePartida',
-						deleteAction : 'InvasionServlet?action=deletePartida'
-					},
-					fields : {
-						id : {
-							key : true,
-							list : false
-						},
-						nombre : {
-							title : 'Partida',
-							width : '20%'
-						},
-						jugadores : {
-							title : 'Jugadores',
-							width : '30%'
-						},
-						creador : {
-							title : 'Creador',
-							width : '5%'
-						},
-						estado : {
-							title : 'Estado de la partida',
-							width : '5%'
-						},
-						fechaInicio : {
-							title : 'Iniciada',
-							width : '5%',
-							type : 'date',
-							displayFormat : 'dd-mm-yy'
-						},
-						fechaFin : {
-							title : 'Acabada',
-							width : '5%',
-							type : 'date',
-							displayFormat : 'dd-mm-yy'
-						}
-					}
-
-					
-
-				});
-				 */
-				$('#tablaUsuarios').jtable('load');
-				//$('#tablaPartidas').jtable('load');
-			});
-		</script>
-
+		
+		<h1>Partidas</h1>
+		<table class="tableAdminGames">
+		<thead>
+			<tr><td>Id</td><td>Nombre</td><td>Creador</td><td>Estado</td><td>FechaInicio</td></tr>
+		</thead>
+		<tbody>
+			<c:forEach items="${games}" var="g">
+				<tr><td>${g.id}<td>${e:forHtmlContent(g.nombre)}<td>---
+				<td>${g.estado}<td>--- </tr>
+			</c:forEach>
+			<c:if test="${empty games}">
+						<tr>
+							<td>---
+							<td>---
+							<td>---
+							<td>---
+							<td>---
+						</tr>
+					</c:if>
+		</tbody>	
+		</table>
+		
+		<div id="delete">
+			<label>Partida que desea borrar: </label><input type="text" id="nameDelPartida" />
+			<input type="button" id="btnDelPartida" value="Eliminar" />
+		</div>
+		
 
 		<div class="end"></div>
 	</div>
