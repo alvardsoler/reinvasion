@@ -96,7 +96,7 @@ public class Partida {
 				jp.addJugador(colores[jugadores.size() - 1]);
 			}
 		}
-		LeerMapa mapa = new LeerMapa("mapa");
+		LeerMapa mapa = new LeerMapa("/home/alvar/git/furia77/reinvasion/src/main/resources/mapa");
 		mapa.inicializarMapa(jp);
 		mapa.asignarJugadoresPaises(jp);
 		Gson gson = new Gson();
@@ -171,16 +171,8 @@ public class Partida {
 		this.fechaInicio = fechaInicio;
 	}
 
-	@Column(length = 10240)
+	@Column(unique = false, nullable = true)
 	public String getJson() {
-
-		if (json == null)
-			try {
-				inicializarPartida(null);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
 		return json;
 	}
 

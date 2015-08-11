@@ -121,7 +121,9 @@ public class ServicioAplicacionPartida {
 	// }
 
 	public static Partida update(EntityManager entityManager, Partida p) {
-		try {
+		try {		
+			Usuario u = ServicioAplicacionUsuario.readById(entityManager, p.getCreador().getId());
+			p.setCreador(u);
 			entityManager.persist(p);
 			return entityManager.find(Partida.class, p.getId());
 		} catch (Exception e) {

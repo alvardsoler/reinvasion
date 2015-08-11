@@ -108,10 +108,10 @@ public class HomeController {
 
 		Partida p = ServicioAplicacionPartida.getPartida(entityManager,
 				idPartida);
-		Long num = (Long) entityManager.createNamedQuery("numberPlayers").
-				setParameter("idPartida", p.getId()).getSingleResult();
-		
-		if(num<3){
+		Long num = (Long) entityManager.createNamedQuery("numberPlayers")
+				.setParameter("idPartida", p.getId()).getSingleResult();
+
+		if (num < 3) {
 			if (p.getEstado() == Partida.EstadoPartida.ESPERANDO) {
 				List<Partida> lp = (List<Partida>) entityManager
 						.createNamedQuery("isUserInPartida")
@@ -121,24 +121,22 @@ public class HomeController {
 				if (lp.size() == 0) { // se introduce el usuario
 					ServicioAplicacionPartida.addUserToGame(entityManager,
 							idPartida, u.getId());
-					if(num+1==3){
+					if (num + 1 == 3) {
 						p.setEstado(Partida.EstadoPartida.EN_CURSO);
 					}
 					return jsonOK;
 				} else
 					return jsonNO;// ya está dentro
-	
+
 			} // else la partida ya ha comenzado
 			else
 				return jsonNO;
-		}
-		else{
+		} else {
 			return jsonNO;
 		}
 
 	}
 
-	
 	@RequestMapping(value = "/accederPartida", method = RequestMethod.POST)
 	@ResponseBody
 	@Transactional
@@ -147,20 +145,18 @@ public class HomeController {
 		logger.info("!!!!!!!!!!! -> Acceder a partida");
 		Partida p = ServicioAplicacionPartida.getPartida(entityManager,
 				idPartida);
-		Long num = (Long) entityManager.createNamedQuery("numberPlayers").
-				setParameter("idPartida", p.getId()).getSingleResult();
-		
-		if(num<3){
+		Long num = (Long) entityManager.createNamedQuery("numberPlayers")
+				.setParameter("idPartida", p.getId()).getSingleResult();
+
+		if (num < 3) {
 			return jsonNO;
-		}
-		else if(num==3){
+		} else if (num == 3) {
 			return jsonOK;
-		}
-		else{
+		} else {
 			return jsonNO;
 		}
 	}
-	
+
 	@RequestMapping(value = "/loginUser", method = RequestMethod.POST)
 	@ResponseBody
 	public String loginUser(@RequestParam("username") String username,
@@ -198,12 +194,13 @@ public class HomeController {
 		 */
 		logger.info("El nombre del usuario es: ", username);
 		if (isAdmin(session)
-				|| ((Usuario) session.getAttribute("usuario")).getLogin().equalsIgnoreCase(username)) {
+				|| ((Usuario) session.getAttribute("usuario")).getLogin()
+						.equalsIgnoreCase(username)) {
 			ServicioAplicacionUsuario sau = new ServicioAplicacionUsuario();
-			if (sau.update(entityManager, username, email, pass) != null){
+			if (sau.update(entityManager, username, email, pass) != null) {
 				return jsonOK;
 			}
-			
+
 		}
 		return jsonNO;
 
@@ -226,12 +223,12 @@ public class HomeController {
 			return "{\"res\": \"NOPE\"}";
 
 	}
-	
+
 	@RequestMapping(value = "/delGame", method = RequestMethod.POST)
 	@Transactional
 	@ResponseBody
 	public String delGame(@RequestParam("gamename") String gamename,
-			@RequestParam("csrf") String token,HttpServletRequest request,
+			@RequestParam("csrf") String token, HttpServletRequest request,
 			Model mode, HttpSession session) {
 		logger.info("Intentando eliminar la partida {}", gamename);
 		if (isAdmin(session) && isTokenValid(session, token)) {
@@ -244,7 +241,6 @@ public class HomeController {
 			return "{\"res\": \"NOPEA\"}";
 
 	}
-	
 
 	/* Funciones de carga de páginas */
 
@@ -273,8 +269,10 @@ public class HomeController {
 		// harbria que comprobar que el usuario está en la partida
 		Partida p = ServicioAplicacionPartida.getPartida(entityManager,
 				idPartida);
-		p.inicializarPartida(entityManager);
-
+		if (p.getJson() == null) {
+			p.inicializarPartida(entityManager);
+			ServicioAplicacionPartida.update(entityManager, p);
+		}
 		if (p.getEstado() != Partida.EstadoPartida.ESPERANDO)
 			model.addAttribute("jsonPartida", p.getJson());
 
@@ -301,16 +299,16 @@ public class HomeController {
 			for (int i = 0; i < partidasUsuario.size(); i++) {
 				UsuarioPartidaId id = partidasUsuario.get(i).getId();
 				ret.add(ServicioAplicacionPartida.getPartida(entityManager,
-						id.getIdPartida()));				
+						id.getIdPartida()));
 			}
 			model.addAttribute("partidasUnido", ret);
 		}
 
 		// List<Partida> resto =
 		// ServicioAplicacionPartida.readAll(entityManager);
-		
-		List<Partida> resto = ServicioAplicacionPartida.readAllWaiting(
-				entityManager);
+
+		List<Partida> resto = ServicioAplicacionPartida
+				.readAllWaiting(entityManager);
 		List<Partida> noUnido = new ArrayList<Partida>();
 
 		if (resto.size() > 0) {
@@ -398,14 +396,15 @@ public class HomeController {
 	public String adminView(Model model, HttpSession session) {
 		logger.info("VIEW: Cargando panel de admin");
 		model.addAttribute("pageTitle", "Admin - Invasion Strategy Game");
-		if (isAdmin(session)){
-			List<Usuario> users = ServicioAplicacionUsuario.readAll(entityManager);
-			model.addAttribute("users",users);
-			List<Partida> games = ServicioAplicacionPartida.readAllStarted(entityManager);
-			model.addAttribute("games",games);
+		if (isAdmin(session)) {
+			List<Usuario> users = ServicioAplicacionUsuario
+					.readAll(entityManager);
+			model.addAttribute("users", users);
+			List<Partida> games = ServicioAplicacionPartida
+					.readAllStarted(entityManager);
+			model.addAttribute("games", games);
 			return "admin";
-		}
-		else
+		} else
 			return "home";
 	}
 
@@ -493,52 +492,62 @@ public class HomeController {
 		String t = (String) session.getAttribute("csrf_token");
 		return (t != null) && t.equals(token);
 	}
-	
+
 	/**
 	 * Returns a users' photo
-	 * @param id id of user to get photo from
+	 * 
+	 * @param id
+	 *            id of user to get photo from
 	 * @return
 	 */
 	@ResponseBody
-	@RequestMapping(value="/usuario/photo", method = RequestMethod.GET, produces = MediaType.IMAGE_JPEG_VALUE)
+	@RequestMapping(value = "/usuario/photo", method = RequestMethod.GET, produces = MediaType.IMAGE_JPEG_VALUE)
 	public byte[] userPhoto(@RequestParam("id") String id) throws IOException {
-	    File f = ContextInitializer.getFile("user", id);
-	    InputStream in = null;
-	    if (f.exists()) {
-	    	in = new BufferedInputStream(new FileInputStream(f));
-	    } else {
-	    	in = new BufferedInputStream(
-	    			this.getClass().getClassLoader().getResourceAsStream("unknown-user.jpg"));
-	    }
-	    
-	    return IOUtils.toByteArray(in);
+		File f = ContextInitializer.getFile("user", id);
+		InputStream in = null;
+		if (f.exists()) {
+			in = new BufferedInputStream(new FileInputStream(f));
+		} else {
+			in = new BufferedInputStream(this.getClass().getClassLoader()
+					.getResourceAsStream("unknown-user.jpg"));
+		}
+
+		return IOUtils.toByteArray(in);
 	}
-	
+
 	/**
 	 * Uploads a photo for a user
-	 * @param id of user 
-	 * @param photo to upload
+	 * 
+	 * @param id
+	 *            of user
+	 * @param photo
+	 *            to upload
 	 * @return
 	 */
-	@RequestMapping(value="/usuario", method=RequestMethod.POST)
-    public @ResponseBody String handleFileUpload(@RequestParam("photo") MultipartFile photo,
-    		@RequestParam("id") String id){
-        if (!photo.isEmpty()) {
-            try {
-                byte[] bytes = photo.getBytes();
-                BufferedOutputStream stream =
-                        new BufferedOutputStream(
-                        		new FileOutputStream(ContextInitializer.getFile("user", id)));
-                stream.write(bytes);
-                stream.close();
-                return "You successfully uploaded " + id + 
-                		" into " + ContextInitializer.getFile("user", id).getAbsolutePath() + "!";
-            } catch (Exception e) {
-                return "You failed to upload " + id + " => " + e.getMessage();
-            }
-        } else {
-            return "You failed to upload a photo for " + id + " because the file was empty.";
-        }
-    }
+	@RequestMapping(value = "/usuario", method = RequestMethod.POST)
+	public @ResponseBody String handleFileUpload(
+			@RequestParam("photo") MultipartFile photo,
+			@RequestParam("id") String id) {
+		if (!photo.isEmpty()) {
+			try {
+				byte[] bytes = photo.getBytes();
+				BufferedOutputStream stream = new BufferedOutputStream(
+						new FileOutputStream(ContextInitializer.getFile("user",
+								id)));
+				stream.write(bytes);
+				stream.close();
+				return "You successfully uploaded "
+						+ id
+						+ " into "
+						+ ContextInitializer.getFile("user", id)
+								.getAbsolutePath() + "!";
+			} catch (Exception e) {
+				return "You failed to upload " + id + " => " + e.getMessage();
+			}
+		} else {
+			return "You failed to upload a photo for " + id
+					+ " because the file was empty.";
+		}
+	}
 
 }

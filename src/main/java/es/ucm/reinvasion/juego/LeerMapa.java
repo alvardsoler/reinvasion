@@ -17,11 +17,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 
-
-
-
-
-
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
@@ -32,17 +27,20 @@ import com.google.gson.Gson;
  * @author alejandro
  */
 public class LeerMapa {
-//	private File archivo;
-//	private FileReader fr;
-//	private FileReader frcopy;
+	private File archivo;
+	private FileReader fr;
+	private FileReader frcopy;
 	private BufferedReader br;
 
 	public LeerMapa(String nombreArchivo) throws IOException {
-		Resource resource = new ClassPathResource(nombreArchivo);
-		InputStream resourceInputStream = resource.getInputStream();		
-		
-
-		br = new BufferedReader(new InputStreamReader(resourceInputStream, "UTF-8"));
+		// Resource resource = new ClassPathResource(nombreArchivo);
+		// InputStream resourceInputStream = resource.getInputStream();
+		// br = new BufferedReader(new InputStreamReader(resourceInputStream,
+		// "UTF-8"));
+		archivo = new File(nombreArchivo);
+		fr = new FileReader(archivo);
+		frcopy = new FileReader(archivo);
+		br = new BufferedReader(fr);
 	}
 
 	public HashMap<String, Integer> idAlfabeticos() throws IOException {
@@ -65,7 +63,7 @@ public class LeerMapa {
 		String linea;
 		Gson gson = new Gson();
 		HashMap<String, Integer> mapa1 = idAlfabeticos();
-//		br = new BufferedReader(frcopy);
+		 br = new BufferedReader(frcopy);
 		HashMap<String, Integer> mapa = new HashMap<String, Integer>();
 
 		while ((linea = br.readLine()) != null) {
@@ -94,7 +92,7 @@ public class LeerMapa {
 			}
 		}
 		System.out.println(gson.toJson(mapa));
-//		fr.close();
+		// fr.close();
 		br.close();
 	}
 
@@ -134,29 +132,29 @@ public class LeerMapa {
 		return a;
 	}
 
-	public static void main(String[] arg) throws FileNotFoundException,
-			IOException {
-		LeerMapa mapa = new LeerMapa("mapa");
-		JuegoPartida p = new JuegoPartida();
-		p.addJugador("azul");
-		p.addJugador("rojo");
-		p.addJugador("blanco");
-
-		// mapa1.idAlfabeticos();
-
-		mapa.inicializarMapa(p);
-		ArrayList<Pais> paises = new ArrayList<Pais>();
-		paises = p.getPaises();
-		for (int i = 0; i < paises.size(); i++) {
-			System.out.print(paises.get(i).getId() + " -> ");
-			for (int j = 0; j < paises.get(i).getFronteras().size(); j++) {
-				System.out.print(paises.get(i).getFronteras().get(j) + " ");
-			}
-			System.out.println();
-		}
-		mapa.asignarJugadoresPaises(p);
-		System.out.println(p.serializa());
-		System.out.println("Fin");
-
-	}
+//	public static void main(String[] arg) throws FileNotFoundException,
+//			IOException {
+//		LeerMapa mapa = new LeerMapa("mapa");
+//		JuegoPartida p = new JuegoPartida();
+//		p.addJugador("azul");
+//		p.addJugador("rojo");
+//		p.addJugador("blanco");
+//
+//		// mapa1.idAlfabeticos();
+//
+//		mapa.inicializarMapa(p);
+//		ArrayList<Pais> paises = new ArrayList<Pais>();
+//		paises = p.getPaises();
+//		for (int i = 0; i < paises.size(); i++) {
+//			System.out.print(paises.get(i).getId() + " -> ");
+//			for (int j = 0; j < paises.get(i).getFronteras().size(); j++) {
+//				System.out.print(paises.get(i).getFronteras().get(j) + " ");
+//			}
+//			System.out.println();
+//		}
+//		mapa.asignarJugadoresPaises(p);
+//		System.out.println(p.serializa());
+//		System.out.println("Fin");
+//
+//	}
 }
