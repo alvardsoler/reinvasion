@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityManager;
@@ -96,11 +97,12 @@ public class Partida {
 				jp.addJugador(colores[jugadores.size() - 1]);
 			}
 		}
-		LeerMapa mapa = new LeerMapa("/home/alvar/git/furia77/reinvasion/src/main/resources/mapa");
+		LeerMapa mapa = new LeerMapa("/Users/Alex/git/reinvasion/src/main/java/es/ucm/reinvasion/juego/mapa");
 		mapa.inicializarMapa(jp);
 		mapa.asignarJugadoresPaises(jp);
 		Gson gson = new Gson();
-		json = gson.toJson(jp, JuegoPartida.class);
+		this.json = gson.toJson(jp, JuegoPartida.class);
+		System.out.println(this.json);
 		if (estado != EstadoPartida.EN_CURSO) // por si la partida comienza
 												// antes de llegar al máximo
 			estado = EstadoPartida.EN_CURSO;

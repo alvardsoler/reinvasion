@@ -124,7 +124,7 @@ public class ServicioAplicacionPartida {
 		try {		
 			Usuario u = ServicioAplicacionUsuario.readById(entityManager, p.getCreador().getId());
 			p.setCreador(u);
-			entityManager.persist(p);
+			entityManager.merge(p);
 			return entityManager.find(Partida.class, p.getId());
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -61,23 +61,23 @@
 	}
 
 	function accederPartida(partida) {
-		window.location.href = "${prefix}partida/" + partida;
-		// 		$.ajax({
-		// 			method : "POST",
-		// 			url : "${prefix}accederPartida",   
-		// 			data : {
-		// 				idPartida : partida
-		// 			},
-		// 			dataType : "json",
-		// 			success : function(data) {
-		// 				if (data.res == "YES") {
-		// 					window.location.href = "${prefix}partida/" + partida;
-		// 				}
-		// 				else{
-		// 					alert("No se han unido aun todos los usuarios. Espere");
-		// 				}
-		// 			}
-		// 		})
+		//window.location.href = "${prefix}partida/" + partida;
+ 		$.ajax({
+ 			method : "POST",
+ 			url : "${prefix}accederPartida",   
+ 			data : {
+ 				idPartida : partida
+ 			},
+ 			dataType : "json",
+ 			success : function(data) {
+ 				if (data.res == "YES") {
+ 					window.location.href = "${prefix}partida/" + partida;
+ 				}
+ 				else{
+ 					alert("No se han unido aun todos los usuarios. Espere");
+ 				}
+ 			}
+ 		})
 
 	}
 </script>
