@@ -12,6 +12,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -33,11 +34,8 @@ public class LeerMapa {
 	private BufferedReader br;
 
 	public LeerMapa(String nombreArchivo) throws IOException {
-		// Resource resource = new ClassPathResource(nombreArchivo);
-		// InputStream resourceInputStream = resource.getInputStream();
-		// br = new BufferedReader(new InputStreamReader(resourceInputStream,
-		// "UTF-8"));
-		archivo = new File(nombreArchivo);
+		URL url = getClass().getResource(nombreArchivo);
+		archivo = new File(url.getPath());
 		fr = new FileReader(archivo);
 		frcopy = new FileReader(archivo);
 		br = new BufferedReader(fr);
