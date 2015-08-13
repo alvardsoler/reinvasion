@@ -255,6 +255,7 @@ public class HomeController {
 		return "home";
 	}
 
+	@Transactional
 	@RequestMapping(value = "/partida/{idPartida}", method = RequestMethod.GET)
 	public String getPartida(@PathVariable("idPartida") long idPartida,
 			Model model) throws IOException {

@@ -32,7 +32,7 @@ import es.ucm.reinvasion.juego.LeerMapa;
 		// "select p from Partida p where p.jugadores IN (:idUser)"),
 		@NamedQuery(name = "delPartida", query = "delete from Partida p where p.id = :idParam"),
 		@NamedQuery(name = "delPartidaByName", query = "delete from Partida p where p.nombre = :nombreParam"),
-		@NamedQuery(name = "allPartidas", query = "select p from Partida p where p.estado = :estado") })
+		@NamedQuery(name = "allPartidas", query = "select p from Partida p where p.estado = :estado")})
 public class Partida {
 	public enum EstadoPartida {
 		ESPERANDO, EN_CURSO, FINALIZADA;
@@ -97,7 +97,7 @@ public class Partida {
 				jp.addJugador(colores[jugadores.size() - 1]);
 			}
 		}
-		LeerMapa mapa = new LeerMapa("/Users/Alex/git/reinvasion/src/main/java/es/ucm/reinvasion/juego/mapa");
+		LeerMapa mapa = new LeerMapa("mapa");
 		mapa.inicializarMapa(jp);
 		mapa.asignarJugadoresPaises(jp);
 		Gson gson = new Gson();

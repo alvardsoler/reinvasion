@@ -1,13 +1,18 @@
 package es.ucm.reinvasion.model;
 
+import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 import javax.persistence.Query;
+import javax.transaction.Transactional;
 
+import org.springframework.transaction.annotation.Propagation;
 
+import com.google.gson.GsonBuilder;
 
 public class ServicioAplicacionPartida {
 
@@ -31,15 +36,19 @@ public class ServicioAplicacionPartida {
 		}
 
 	}
-	
-	public static List<Usuario> getUsersInGame(EntityManager entityManager, long idPartida){
-		Query q = entityManager.createQuery("select jp from Usuario_Partida jp where partidaId = " + idPartida);
+
+	public static List<Usuario> getUsersInGame(EntityManager entityManager,
+			long idPartida) {
+		Query q = entityManager
+				.createQuery("select jp from Usuario_Partida jp where partidaId = "
+						+ idPartida);
 		List<Usuario_Partida> aux = q.getResultList();
 		List<Usuario> ret = new ArrayList<Usuario>();
-		for(Usuario_Partida up : aux)
-			ret.add(ServicioAplicacionUsuario.readById(entityManager, up.getId().getIdUsuario()));
-		
-		return ret; 
+		for (Usuario_Partida up : aux)
+			ret.add(ServicioAplicacionUsuario.readById(entityManager, up
+					.getId().getIdUsuario()));
+
+		return ret;
 	}
 
 	public static boolean addUserToGame(EntityManager entityManager,
@@ -70,31 +79,36 @@ public class ServicioAplicacionPartida {
 
 	@SuppressWarnings("unchecked")
 	public static List<Partida> readAllWaiting(EntityManager entityManager) {
-		return entityManager.createNamedQuery("allPartidas").setParameter("estado", Partida.EstadoPartida.ESPERANDO).getResultList();
+		return entityManager.createNamedQuery("allPartidas")
+				.setParameter("estado", Partida.EstadoPartida.ESPERANDO)
+				.getResultList();
 	}
 
 	public static List<Partida> readAllWithoutUser(EntityManager entityManager,
 			long idUser) {
-		
-		List<Usuario_Partida> aux =  (List<Usuario_Partida>) entityManager
-				.createQuery("select up from Usuario_Partida up where usuarioid !="
-						+ idUser + " ").getResultList();
+
+		List<Usuario_Partida> aux = (List<Usuario_Partida>) entityManager
+				.createQuery(
+						"select up from Usuario_Partida up where usuarioid !="
+								+ idUser + " ").getResultList();
 		List<Partida> ret = new ArrayList<Partida>();
-		for (Usuario_Partida a : aux){
+		for (Usuario_Partida a : aux) {
 			ret.add(getPartida(entityManager, a.getId().getIdPartida()));
 		}
 		return ret;
 	}
 
-	public static List<Partida> readAllStarted(EntityManager entityManager){
-		return entityManager.createNamedQuery("allPartidas").setParameter("estado", Partida.EstadoPartida.EN_CURSO).getResultList();
+	public static List<Partida> readAllStarted(EntityManager entityManager) {
+		return entityManager.createNamedQuery("allPartidas")
+				.setParameter("estado", Partida.EstadoPartida.EN_CURSO)
+				.getResultList();
 	}
-	
+
 	public static List<Partida> readAllByUserIn(EntityManager entityManager,
 			Usuario usuario) {
 		List<Partida> ret = entityManager.createNamedQuery("partidaConUsuario")
 				.setParameter("idUser", usuario.getId()).getResultList();
-		if(ret.isEmpty()){
+		if (ret.isEmpty()) {
 			return null;
 		}
 		return ret;
@@ -119,12 +133,27 @@ public class ServicioAplicacionPartida {
 	//
 	// return p;
 	// }
-
+	@Transactional
 	public static Partida update(EntityManager entityManager, Partida p) {
-		try {		
-			Usuario u = ServicioAplicacionUsuario.readById(entityManager, p.getCreador().getId());
-			p.setCreador(u);
-			entityManager.merge(p);
+		try {
+			
+//			Usuario u = ServicioAplicacionUsuario.readById(entityManager, p
+//					.getCreador().getId());
+//			p.setCreador(u);
+			
+			Query q = entityManager.createNativeQuery("update Partida p SET p.json=:json where p.id=:id");
+			q.setParameter("json", p.getJson());
+			q.setParameter("id", p.getId());
+//			entityManager.joinTransaction();
+			int r = q.executeUpdate();
+			System.out.println(r);
+//			Partida aux =  entityManager.merge(p);			
+//			System.out.println(aux.toString());
+//			String jsonAux = p.getJson();
+//			jsonAux = jsonAux.replaceAll("\"", "");
+
+
+//			entityManager.createNativeQuery(str).executeUpdate();
 			return entityManager.find(Partida.class, p.getId());
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -137,18 +166,21 @@ public class ServicioAplicacionPartida {
 				.setParameter("idParam", id).executeUpdate();
 		return null;
 	}
-	
-	public static boolean deleteByname(EntityManager entityManager, String name){
-		Partida p = (Partida) entityManager.createNamedQuery("partidaByNombre").setParameter("nombreParam", name).getSingleResult();
-		if(p!=null){
+
+	public static boolean deleteByname(EntityManager entityManager, String name) {
+		Partida p = (Partida) entityManager.createNamedQuery("partidaByNombre")
+				.setParameter("nombreParam", name).getSingleResult();
+		if (p != null) {
 			System.out.println("He llegado");
-			if(p.getEstado().equals(Partida.EstadoPartida.EN_CURSO) || p.getEstado().equals(Partida.EstadoPartida.FINALIZADA)){
-				entityManager.createNamedQuery("delUserFromPartida").setParameter("idPartida", p.getId()).executeUpdate();
-				entityManager.createNamedQuery("delPartidaByName").setParameter("nombreParam", name).executeUpdate();
+			if (p.getEstado().equals(Partida.EstadoPartida.EN_CURSO)
+					|| p.getEstado().equals(Partida.EstadoPartida.FINALIZADA)) {
+				entityManager.createNamedQuery("delUserFromPartida")
+						.setParameter("idPartida", p.getId()).executeUpdate();
+				entityManager.createNamedQuery("delPartidaByName")
+						.setParameter("nombreParam", name).executeUpdate();
 				return true;
 			}
-		}
-		else{
+		} else {
 			return false;
 		}
 		return true;
