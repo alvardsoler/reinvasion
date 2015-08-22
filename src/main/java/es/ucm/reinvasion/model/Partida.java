@@ -55,7 +55,6 @@ public class Partida {
 		p.creador = creador;
 		p.fechaInicio = fechaInicio;
 		p.estado = EstadoPartida.ESPERANDO;
-
 		return p;
 	}
 
@@ -92,9 +91,10 @@ public class Partida {
 		if (entityManager != null) {
 			List<Usuario> jugadores = ServicioAplicacionPartida.getUsersInGame(
 					entityManager, this.id);
-
+			int i = 0;
 			for (Usuario j : jugadores) {
-				jp.addJugador(colores[jugadores.size() - 1]);
+				jp.addJugador(colores[i],  j.getId());
+				i++;
 			}
 		}
 		LeerMapa mapa = new LeerMapa("mapa");

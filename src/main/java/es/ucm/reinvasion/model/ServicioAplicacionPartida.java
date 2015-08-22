@@ -135,25 +135,13 @@ public class ServicioAplicacionPartida {
 	// }
 	@Transactional
 	public static Partida update(EntityManager entityManager, Partida p) {
-		try {
-			
-//			Usuario u = ServicioAplicacionUsuario.readById(entityManager, p
-//					.getCreador().getId());
-//			p.setCreador(u);
-			
+		try {				
 			Query q = entityManager.createNativeQuery("update Partida p SET p.json=:json where p.id=:id");
 			q.setParameter("json", p.getJson());
 			q.setParameter("id", p.getId());
 //			entityManager.joinTransaction();
 			int r = q.executeUpdate();
 			System.out.println(r);
-//			Partida aux =  entityManager.merge(p);			
-//			System.out.println(aux.toString());
-//			String jsonAux = p.getJson();
-//			jsonAux = jsonAux.replaceAll("\"", "");
-
-
-//			entityManager.createNativeQuery(str).executeUpdate();
 			return entityManager.find(Partida.class, p.getId());
 		} catch (Exception e) {
 			e.printStackTrace();

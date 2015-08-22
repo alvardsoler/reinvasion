@@ -7,9 +7,9 @@ public class Pais {
     private final int id;
     private final ArrayList<Integer> paisesFrontera;
     private int unidades;
-    private int propietario;
+    private long propietario;
 
-    public Pais(ArrayList<Integer> paisesFrontera, int propietario, int id) {
+    public Pais(ArrayList<Integer> paisesFrontera, long propietario, int id) {
         this.paisesFrontera = paisesFrontera;
         this.propietario = propietario;
         this.unidades = 1;
@@ -17,7 +17,7 @@ public class Pais {
         
     }
 
-    public Pais(int propietario, int id) {
+    public Pais(long propietario, int id) {
         this.paisesFrontera = new ArrayList<Integer>();
         this.propietario = propietario;
         this.unidades = 1;
@@ -59,11 +59,11 @@ public class Pais {
         this.unidades = unidades;
     }
 
-    public int getPropietario() {
+    public long getPropietario() {
         return propietario;
     }
 
-    public void setPropietario(int propietario) {
+    public void setPropietario(long propietario) {
         this.propietario = propietario;
     }
 }

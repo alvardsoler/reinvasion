@@ -5,14 +5,14 @@ import java.util.ArrayList;
 
 public class Jugador {
 
-    private int id;
+    private long id;
     private ArrayList<Integer> paisesControlados;
     private ArrayList<Carta> cartas;
     private int unidadesSinDesplegar;
 
     private String color;
 
-    public Jugador(String color, int id) {
+    public Jugador(String color, long id) {
         this.id = id;
         this.color = color;
         this.cartas = new ArrayList<Carta>();
@@ -26,7 +26,7 @@ public class Jugador {
         this.paisesControlados = paisesControlados;
     }
     
-    public int getId() {
+    public long getId() {
         return id;
     }
 

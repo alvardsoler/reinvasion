@@ -11,7 +11,7 @@ public class JuegoPartida {
 	private ArrayList<Pais> paises;
 
 	private int turno;
-	private int jugadorActivo;
+	private long jugadorActivo;
 	private boolean fin;
 
 	public String serializa() {
@@ -49,8 +49,9 @@ public class JuegoPartida {
 		fin = false;
 	}
 
-	public void addJugador(String color) {
-		Jugador j = new Jugador(color, jugadores.size());
+	public void addJugador(String color, Long id) {
+		Jugador j = new Jugador(color, id);
+		j.setUnidadesSinDesplegar(20);
 		jugadores.add(j);
 	}
 
@@ -60,8 +61,12 @@ public class JuegoPartida {
 		getJugador(propietario).addPais(p.getId());
 	}
 
-	public Jugador getJugador(int id) {
-		return jugadores.get(id);
+	public Jugador getJugador(long id) {
+		for (Jugador j : jugadores)
+			if (j.getId() == id) return j;
+		
+		return null;
+		//return jugadores.get(id);
 	}
 
 	public Pais getPais(int id) {
@@ -111,6 +116,14 @@ public class JuegoPartida {
 		}
 	}
 
+	public void siguiente(){
+		for (int i = 0; i < jugadores.size(); i++){
+			if (jugadorActivo == jugadores.get(i).getId()){
+				if (i < (jugadores.size() -1)) jugadorActivo = jugadores.get(i+1).getId();
+				else jugadorActivo = jugadores.get(0).getId();
+			}
+		}
+	}
 	public void atacar(int atacante, int defensor) {
 		atacar(getPais(atacante), getPais(defensor));
 	}
@@ -210,11 +223,11 @@ public class JuegoPartida {
 		this.turno = turno;
 	}
 
-	public int getJugadorActivo() {
+	public long getJugadorActivo() {
 		return jugadorActivo;
 	}
 
-	public void setJugadorActivo(int jugadorActivo) {
+	public void setJugadorActivo(long jugadorActivo) {
 		this.jugadorActivo = jugadorActivo;
 	}
 }

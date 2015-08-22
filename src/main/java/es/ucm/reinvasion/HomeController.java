@@ -2,11 +2,13 @@ package es.ucm.reinvasion;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -16,6 +18,7 @@ import java.util.UUID;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -36,6 +39,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.google.gson.Gson;
 
+import es.ucm.reinvasion.juego.JuegoPartida;
 import es.ucm.reinvasion.model.Partida;
 import es.ucm.reinvasion.model.ServicioAplicacionPartida;
 import es.ucm.reinvasion.model.ServicioAplicacionUsuario;
@@ -278,6 +282,51 @@ public class HomeController {
 			model.addAttribute("jsonPartida", p.getJson());
 
 		return "partida";
+	}
+	@Transactional
+	@ResponseBody
+	@RequestMapping(value = "/postPartida", method = RequestMethod.POST)
+	protected void doPost(HttpServletRequest request,
+			HttpServletResponse response, Model model, HttpSession session)
+			throws ServletException, IOException {
+
+		// 1. get received JSON data from request
+		BufferedReader br = new BufferedReader(new InputStreamReader(
+				request.getInputStream()));
+
+		Gson gson = new Gson();
+		String json = "";
+		json = br.readLine();
+
+		Operacion operacion = gson.fromJson(json, Operacion.class);
+		
+		
+		Partida p = ServicioAplicacionPartida.getPartida(entityManager, Integer.parseInt(operacion.getIdPartida()));
+			
+
+		// es.ucm.invasion.juego.Partida partida = p.getPartida();
+		JuegoPartida partida = gson.fromJson(p.getJson(), JuegoPartida.class);
+		
+		if (operacion.getOperacion().equals("ataque")) {
+			partida.atacar(operacion.getOp1(), operacion.getOp2());
+		} else if (operacion.getOperacion().equals("movimiento")) {
+			partida.mover(operacion.getOp1(), operacion.getOp2(),
+					operacion.getOp3());
+		} else if (operacion.getOperacion().equals("siguiente")) {		
+			partida.siguiente();
+//			partida.cambiarCartas(operacion.getOp1(), operacion.getOp2());
+		} else if (operacion.getOperacion().equals("despliegue")) {
+			partida.desplegarUnidades(operacion.getOp1(), operacion.getOp2(),
+					operacion.getOp3());
+		}
+		
+		p.setJson(partida.serializa());
+		ServicioAplicacionPartida.update(entityManager, p);
+		
+		logger.info(operacion.toString());
+
+		model.addAttribute("jsonPartida", p.getJson());
+
 	}
 
 	@RequestMapping(value = "/partidas/{username}", method = RequestMethod.GET)

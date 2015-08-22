@@ -1,4 +1,6 @@
 var partida;
+var msPolling = 10000;
+var idUsuario;
 $(function() {
 	$('#vmap').vectorMap({
 		map : 'usa_en',
@@ -33,6 +35,10 @@ $(function() {
 		if (nombreAcoordenada[idAnombre[i]] == undefined)
 			console.log(i);
 	}
+	idUsuario = document.getElementById("usuarioId").value;
+	partida.jugadores[getUserPosition(idUsuario)].unidadesSinDesplegar == 0 ? estado.actual = estado.movimiento
+			: estado.actual = estado.despliegue;
+	// estado.actual = estado.despliegue;
 	dibujarInfoJugadores();
 	coloreaPaises();
 	muestraUnidades();
@@ -45,314 +51,46 @@ function colorea(idPais, color) {
 	$('#vmap').vectorMap('set', 'colors', o);
 }
 
-// jsonRecibido[0] despues de JSON.parse()
-// var partida = {
-// "jugadores" : [
-// {
-// "id" : 0,
-// "paisesControlados" : [ 43, 2, 5, 0, 13, 23, 34, 29, 9, 18, 42,
-// 47, 1, 28, 25, 27, 15 ],
-// "cartas" : [],
-// "unidadesSinDesplegar" : 0,
-// "color" : "azul"
-// },
-// {
-// "id" : 1,
-// "paisesControlados" : [ 6, 31, 49, 38, 48, 10, 14, 21, 19, 4,
-// 40, 39, 7, 36, 11, 33, 17 ],
-// "cartas" : [],
-// "unidadesSinDesplegar" : 0,
-// "color" : "rojo"
-// },
-// {
-// "id" : 2,
-// "paisesControlados" : [ 37, 30, 32, 46, 22, 45, 20, 12, 16, 24,
-// 41, 3, 8, 35, 26, 44 ],
-// "cartas" : [],
-// "unidadesSinDesplegar" : 0,
-// "color" : "blanco"
-// } ],
-// "paises" : [ {
-// "id" : 0,
-// "paisesFrontera" : [ 36, 46 ],
-// "unidades" : 1,
-// "propietario" : 0
-// }, {
-// "id" : 1,
-// "paisesFrontera" : [ 24, 41, 9, 8 ],
-// "unidades" : 1,
-// "propietario" : 0
-// }, {
-// "id" : 2,
-// "paisesFrontera" : [ 17, 42, 35, 23, 41, 24 ],
-// "unidades" : 1,
-// "propietario" : 0
-// }, {
-// "id" : 3,
-// "paisesFrontera" : [ 4, 32, 43, 5, 31 ],
-// "unidades" : 1,
-// "propietario" : 2
-// }, {
-// "id" : 4,
-// "paisesFrontera" : [ 32, 3, 36 ],
-// "unidades" : 1,
-// "propietario" : 1
-// }, {
-// "id" : 5,
-// "paisesFrontera" : [ 49, 43, 3, 31, 35, 15, 28 ],
-// "unidades" : 1,
-// "propietario" : 0
-// }, {
-// "id" : 6,
-// "paisesFrontera" : [ 33, 18, 38 ],
-// "unidades" : 1,
-// "propietario" : 1
-// }, {
-// "id" : 7,
-// "paisesFrontera" : [ 19, 37, 30 ],
-// "unidades" : 1,
-// "propietario" : 1
-// }, {
-// "id" : 8,
-// "paisesFrontera" : [ 1, 9 ],
-// "unidades" : 1,
-// "propietario" : 2
-// }, {
-// "id" : 9,
-// "paisesFrontera" : [ 1, 41, 26, 39, 8 ],
-// "unidades" : 1,
-// "propietario" : 0
-// }, {
-// "id" : 10,
-// "paisesFrontera" : [ 42, 3 ],
-// "unidades" : 1,
-// "propietario" : 1
-// }, {
-// "id" : 11,
-// "paisesFrontera" : [ 23, 14, 47, 22, 40, 28 ],
-// "unidades" : 1,
-// "propietario" : 1
-// }, {
-// "id" : 12,
-// "paisesFrontera" : [ 25, 46, 36, 32, 49, 43 ],
-// "unidades" : 1,
-// "propietario" : 2
-// }, {
-// "id" : 13,
-// "paisesFrontera" : [ 16, 14, 47, 11 ],
-// "unidades" : 1,
-// "propietario" : 0
-// }, {
-// "id" : 14,
-// "paisesFrontera" : [ 13, 16, 34, 21 ],
-// "unidades" : 1,
-// "propietario" : 1
-// }, {
-// "id" : 15,
-// "paisesFrontera" : [ 35, 2, 23, 11, 28, 5 ],
-// "unidades" : 1,
-// "propietario" : 0
-// }, {
-// "id" : 16,
-// "paisesFrontera" : [ 41, 44, 48, 34, 14, 13, 23 ],
-// "unidades" : 1,
-// "propietario" : 2
-// }, {
-// "id" : 17,
-// "paisesFrontera" : [ 42, 2, 24 ],
-// "unidades" : 1,
-// "propietario" : 1
-// }, {
-// "id" : 18,
-// "paisesFrontera" : [ 38, 6, 33, 45, 29 ],
-// "unidades" : 1,
-// "propietario" : 0
-// }, {
-// "id" : 19,
-// "paisesFrontera" : [ 44, 48, 37, 7 ],
-// "unidades" : 1,
-// "propietario" : 1
-// }, {
-// "id" : 20,
-// "paisesFrontera" : [ 29 ],
-// "unidades" : 1,
-// "propietario" : 2
-// }, {
-// "id" : 21,
-// "paisesFrontera" : [ 47, 14, 34 ],
-// "unidades" : 1,
-// "propietario" : 1
-// }, {
-// "id" : 22,
-// "paisesFrontera" : [ 27, 40, 11, 47 ],
-// "unidades" : 1,
-// "propietario" : 2
-// }, {
-// "id" : 23,
-// "paisesFrontera" : [ 2, 41, 16, 13, 11, 28, 15, 35 ],
-// "unidades" : 1,
-// "propietario" : 0
-// }, {
-// "id" : 24,
-// "paisesFrontera" : [ 17, 2, 41, 1 ],
-// "unidades" : 1,
-// "propietario" : 2
-// }, {
-// "id" : 25,
-// "paisesFrontera" : [ 12, 49, 40, 27 ],
-// "unidades" : 1,
-// "propietario" : 0
-// }, {
-// "id" : 26,
-// "paisesFrontera" : [ 44, 41, 9, 39 ],
-// "unidades" : 1,
-// "propietario" : 2
-// }, {
-// "id" : 27,
-// "paisesFrontera" : [ 25, 40, 22 ],
-// "unidades" : 1,
-// "propietario" : 0
-// }, {
-// "id" : 28,
-// "paisesFrontera" : [ 49, 5, 15, 23, 11, 40 ],
-// "unidades" : 1,
-// "propietario" : 0
-// }, {
-// "id" : 29,
-// "paisesFrontera" : [ 45, 18, 20 ],
-// "unidades" : 1,
-// "propietario" : 0
-// }, {
-// "id" : 30,
-// "paisesFrontera" : [ 7, 37, 33 ],
-// "unidades" : 1,
-// "propietario" : 2
-// }, {
-// "id" : 31,
-// "paisesFrontera" : [ 3, 43, 5, 35, 42 ],
-// "unidades" : 1,
-// "propietario" : 1
-// }, {
-// "id" : 32,
-// "paisesFrontera" : [ 36, 4, 3, 43, 12 ],
-// "unidades" : 1,
-// "propietario" : 2
-// }, {
-// "id" : 33,
-// "paisesFrontera" : [ 37, 30, 6, 18, 45 ],
-// "unidades" : 1,
-// "propietario" : 1
-// }, {
-// "id" : 34,
-// "paisesFrontera" : [ 21, 14, 16, 48, 37 ],
-// "unidades" : 1,
-// "propietario" : 0
-// }, {
-// "id" : 35,
-// "paisesFrontera" : [ 42, 17, 2, 23, 15, 31, 5 ],
-// "unidades" : 1,
-// "propietario" : 2
-// }, {
-// "id" : 36,
-// "paisesFrontera" : [ 46, 4, 32, 12, 0 ],
-// "unidades" : 1,
-// "propietario" : 1
-// }, {
-// "id" : 37,
-// "paisesFrontera" : [ 34, 48, 19, 30, 33, 7 ],
-// "unidades" : 1,
-// "propietario" : 2
-// }, {
-// "id" : 38,
-// "paisesFrontera" : [ 6, 18 ],
-// "unidades" : 1,
-// "propietario" : 1
-// }, {
-// "id" : 39,
-// "paisesFrontera" : [ 9, 26 ],
-// "unidades" : 1,
-// "propietario" : 1
-// }, {
-// "id" : 40,
-// "paisesFrontera" : [ 27, 25, 49, 28, 11, 22 ],
-// "unidades" : 1,
-// "propietario" : 1
-// }, {
-// "id" : 41,
-// "paisesFrontera" : [ 24, 1, 9, 26, 44, 16, 23, 2 ],
-// "unidades" : 1,
-// "propietario" : 2
-// }, {
-// "id" : 42,
-// "paisesFrontera" : [ 31, 35, 17 ],
-// "unidades" : 1,
-// "propietario" : 0
-// }, {
-// "id" : 43,
-// "paisesFrontera" : [ 32, 12, 3, 31, 5, 49 ],
-// "unidades" : 1,
-// "propietario" : 0
-// }, {
-// "id" : 44,
-// "paisesFrontera" : [ 26, 16, 48, 19 ],
-// "unidades" : 1,
-// "propietario" : 2
-// }, {
-// "id" : 45,
-// "paisesFrontera" : [ 33, 18, 29 ],
-// "unidades" : 1,
-// "propietario" : 2
-// }, {
-// "id" : 46,
-// "paisesFrontera" : [ 12, 36, 0 ],
-// "unidades" : 1,
-// "propietario" : 2
-// }, {
-// "id" : 47,
-// "paisesFrontera" : [ 13, 21, 22, 11 ],
-// "unidades" : 1,
-// "propietario" : 0
-// }, {
-// "id" : 48,
-// "paisesFrontera" : [ 34, 16, 44, 19, 37 ],
-// "unidades" : 1,
-// "propietario" : 1
-// }, {
-// "id" : 49,
-// "paisesFrontera" : [ 12, 43, 5, 28, 40, 25 ],
-// "unidades" : 1,
-// "propietario" : 1
-// } ],
-// "turno" : 1,
-// "jugadorActivo" : 0,
-// "fin" : false
-// };
-
-// jsonRecibido[1] despues de JSON.parse()
-var idUsuario = 0;
-
 function esFrontera(unId, otroId) {
 	return partida.paises[unId].paisesFrontera.indexOf(otroId) != -1;
 }
 function esEnemigo(idPais) {
 	return partida.paises[idPais].propietario != idUsuario;
 }
-
+function esJugadorActivo(){
+	return idUsuario == partida.jugadorActivo;
+}
 function clickPais(idPais) {
-	if (estado.actual == estado.ataque) {
-		if (esEnemigo(idPais)) {
-			estado.actual.clickSuyo(idPais);
-		} else {
-			estado.actual.clickMio(idPais);
+	if (esJugadorActivo()) {
+		if (idPais == estado.idSel) {
+			estado.idSel = undefined;
+			return;
 		}
-		coloreaPaises();
-	} else if (estado.actual == estado.movimiento) {
-		if (esEnemigo(idPais)) {
-			console.log("No se puede mover sobre paises enemigos");
-		} else if (estado.idSel === undefined) {
-			estado.actual.clickOrigen(idPais);
-		} else
-			estado.actual.clickDestino(idPais);
+
+		if (estado.actual == estado.ataque) {
+			if (esEnemigo(idPais)) {
+				estado.actual.clickSuyo(idPais);
+			} else {
+				estado.actual.clickMio(idPais);
+			}
+			coloreaPaises();
+		} else if (estado.actual == estado.movimiento) {
+			if (esEnemigo(idPais)) {
+				console.log("No se puede mover sobre paises enemigos");
+			} else if (estado.idSel === undefined) {
+				estado.actual.clickOrigen(idPais);
+			} else
+				estado.actual.clickDestino(idPais);
+		} else if (estado.actual == estado.despliegue){
+			if (esEnemigo(idPais)) {
+				printInfo("No se puede desplegar unidades sobre países enemigos");
+			} else if (estado.idSel === undefined){
+				estado.actual.clickDestino(idPais);
+			} else {
+				estado.idSel = idPais;
+				estado.actual.clickDestino(idPais);
+			}
+		}
 	}
 }
 var op = {};
@@ -373,9 +111,11 @@ var estado = {
 				return;
 			} else if (esFrontera(id, estado.idSel)) {
 				console.log("atacando de ", estado.idSel, id);
+				printInfo(op)
 				op.op1 = estado.idSel;
 				op.op2 = id;
 				op.operacion = "ataque";
+				printInfo("atacando de " + estado.idSel + " a " + id);
 				console.log(op);
 				sendInfo();
 				// $("#info").append("atacando de ", estado.idSel," a ", id,
@@ -400,6 +140,7 @@ var estado = {
 				op.op2 = id;
 				op.operacion = "movimiento";
 				console.log(op);
+				printInfo("moviendo unidades de " + estado.idSel + " a " + id);
 				console.log("moviendo unidades de ", estado.idSel, id);
 				sendInfo();
 			}
@@ -410,9 +151,11 @@ var estado = {
 		clickDestino : function(id) {
 			if (estado.idSel === undefined || id !== estado.idSel) {
 				estado.idSel = id;
-				op.op1 = id;
-				op.op2 = undefined;
-				op.operacion = "ataque";
+				op.op1 = idUsuario;
+				op.op2 = id;
+				op.op3 = 1;
+				op.operacion = "despliegue";
+				printInfo("desplegando unidades en " + estado.idSel);
 				console.log(op);
 				sendInfo();
 			}
@@ -422,7 +165,21 @@ var estado = {
 	idSel : undefined,
 	actual : undefined
 };
-estado.actual = estado.movimiento;
+// estado.actual = estado.movimiento;
+
+function pasar() {
+	if (!esJugadorActivo()) return;
+	if (estado.actual == estado.despliegue)
+		estado.actual = estado.movimiento;
+	else if (estado.actual == estado.movimiento)
+		estado.actual = estado.ataque;
+	else if (estado.actual == estado.ataque) {
+		estado.actual = estado.despliegue;
+		op.op1 = idUsuario;
+		op.op2 = undefined;
+		op.operacion = "siguiente";
+	}
+}
 
 var idAnombre = {}
 
@@ -533,12 +290,33 @@ var nombreAid = {
 	"wy" : 49
 };
 
-var colores = [ 'rgb(27,158,119)', 'rgb(217,95,2)', 'rgb(117,112,179)',
-		'rgb(231,41,138)', 'rgb(102,166,30)', 'rgb(230,171,2)',
-		'rgb(166,118,29)', 'rgb(102,102,102)' ];
-
 for ( var clave in nombreAid) {
 	idAnombre[nombreAid[clave]] = clave;
+}
+function colorToRgb(colorStr) {
+	var colores = [ {
+		rgb : 'rgb(250,10,10)',
+		str : 'rojo'
+	}, {
+		rgb : 'rgb(10,250,10)',
+		str : 'verde'
+	}, {
+		rgb : 'rgb(10,10,250)',
+		str : 'azul'
+	} ];
+	for (var c = 0; c < colores.length; c++)
+		if (colores[c].str == colorStr)
+			return colores[c].rgb;
+}
+
+function getUserPosition(idUser) {
+	for (var i = 0; i < partida.jugadores.length; i++) {
+		if (idUser == partida.jugadores[i].id)
+			return i;
+	}
+}
+function getColorUser(idUser) {
+	return colorToRgb(partida.jugadores[getUserPosition(idUser)].color);
 }
 
 function coloreaPaises() {
@@ -546,16 +324,16 @@ function coloreaPaises() {
 	for (var i = 0; i < partida.paises.length; i++) {
 		var p = partida.paises[i];
 		o[idAnombre[p.id]] = (p.id === estado.idSel) ? "#ffff00"
-				: colores[p.propietario];
+				: getColorUser(p.propietario);
 		// partida.jugadores[p.propietario].color;
 	}
 	$('#vmap').vectorMap('set', 'colors', o);
 };
 
-//for (var i = 0; i < partida.paises.length; i++) {
-//	if (nombreAcoordenada[idAnombre[i]] == undefined)
-//		console.log(i);
-//};
+// for (var i = 0; i < partida.paises.length; i++) {
+// if (nombreAcoordenada[idAnombre[i]] == undefined)
+// console.log(i);
+// };
 
 function muestraUnidades() {
 	for (var i = 0; i < partida.paises.length; i++) {
@@ -574,12 +352,18 @@ function muestraUnidades() {
 
 var idPartida = 0;
 
+function printInfo(txt) {
+	var panel = document.getElementById('msgLog');
+	panel.textContent = panel.textContent.concat(txt + "\n");
+}
+
 function sendInfo() {
+	var idPartida = document.getElementById('idPartida').value;
 	console.log(op);
 	op.idPartida = idPartida;
 	console.log(op);
 	$.ajax({
-		url : "postPartida",
+		url : "../postPartida",
 		type : 'POST',
 		dataType : 'json',
 		data : JSON.stringify(op),
@@ -587,6 +371,7 @@ function sendInfo() {
 		mimeType : 'application/json',
 		success : function(data) {
 			alert("win");
+			
 			// nos llega info asi q deberíamos repintar el mapa con el resultado
 			// de esto
 
@@ -601,12 +386,31 @@ function sendInfo() {
 // idPartida = $("#idPartida").val();
 //	  
 // });
-function dibujarInfoJugadores() { // habrá que cambiarlo por el nombre del jugador
+
+function strToHex(rgb) {
+	if (rgb == 'rojo')
+		return "#FF0000";
+	else if (rgb == 'verde')
+		return "#00FF00";
+	else
+		return "#0000FF";
+}
+function dibujarInfoJugadores() { // habrá que cambiarlo por el nombre del
+	// jugador
 	var div = document.getElementById('infoJugadores');
 	div.textContent = "";
-	for (var i = 0; i < partida.jugadores.length; i++){
-		if (i == partida.jugadorActivo) div.innerHTML = div.innerHTML +  "-> " + partida.jugadores[i].id + "<br\>";
-		else div.innerHTML = div.innerHTML +  + "   " + partida.jugadores[i].id + "<br\>";
+	for (var i = 0; i < partida.jugadores.length; i++) {
+		var str = '<li class="list-group-item" style="background-color: '
+				+ strToHex(partida.jugadores[i].color) + '">'
+				+ partida.jugadores[i].id + '<span class="badge">' + partida.jugadores[i].unidadesSinDesplegar + '</span>' +'</li>';
+		var strActivo = '<li class="list-group-item" style="background-color: '
+				+ strToHex(partida.jugadores[i].color) + '">'
+				+ partida.jugadores[i].id + '<span class="badge">' + 'Su turno ' + partida.jugadores[i].unidadesSinDesplegar +
+				 '</span></li>';
+		if (partida.jugadores[i].id == partida.jugadorActivo)
+			div.innerHTML = div.innerHTML + strActivo;
+		else
+			div.innerHTML = div.innerHTML + str;
 	}
 
 }
@@ -616,13 +420,13 @@ function getInfo() {
 	console.log(idPartida);
 	var url = "../partida/" + idPartida;
 	$.get(url).done(function(json) {
-		partida = JSON.parse(document.getElementById('jsonPartida').value);		
+		partida = JSON.parse(document.getElementById('jsonPartida').value);
 		dibujarInfoJugadores();
-		window.setTimeout("getInfo()", 3000);				
+		window.setTimeout("getInfo()", msPolling);
 	}).fail(function(jqxhr, textStatus, error) {
 		var err = textStatus + ", " + error;
 		console.log("Request Failed: " + err);
 	});
 
 }
-window.setTimeout("getInfo()", 3000);
+window.setTimeout("getInfo()", msPolling);

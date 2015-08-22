@@ -105,12 +105,12 @@ public class LeerMapa {
 		/*
 		 * for(int i=0; i< perm.length; i++){ System.out.println(perm[i]); }
 		 */
-
+		p.setJugadorActivo(p.getJugadores().get(0).getId());
 		for (int i = 0; i < p.getPaises().size(); i++) {
 			a = perm[i];
 			int j = (i % p.getJugadores().size());
-
-			p.getPaises().get(a).setPropietario(j);
+			
+			p.getPaises().get(a).setPropietario(p.getJugadores().get(j).getId());
 			System.out.println("El país: " + p.getPaises().get(a).getId()
 					+ " es del jugador: " + j);
 			p.getJugadores().get(j).addPais(a);
