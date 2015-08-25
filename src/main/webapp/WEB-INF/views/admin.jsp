@@ -25,6 +25,27 @@
 
 				});
 			});
+		
+		$('#btnMod').click(function() {
+			var username = $('#nameDel').val();
+				$.ajax({
+					method : "POST",
+					url : "${prefix}modUser",
+					data : {
+						username : username,
+						csrf : "${csrf_token}"
+					},
+					dataType : "json",
+					success : function(data) {
+						if (data.res == "YES") {
+							window.location.href = "${prefix}usuario/"+username;
+						} else {
+							alert("Error al modificar el usuario");
+						}
+					}
+
+				});
+			});
 		$('#btnDelPartida').click(function() {
 			var gamename = $('#nameDelPartida').val();
 				$.ajax({
@@ -44,7 +65,7 @@
 						} else if(data.res == "NOPEA"){
 							alert("No tiene permiso para eliminar la partida");
 						}
-						else{
+						else if(data.res == "NOPE"){
 							alert("Error al eliminar la partida");
 						}
 					} 
@@ -78,7 +99,8 @@
 		</table>
 
 		<div id="delete">
-			<label>Usuario para borrar: </label><input type="text" id="nameDel" />
+			<label>Nombre usuario: </label><input type="text" id="nameDel" />
+			<input type="button" id="btnMod" value ="Modificar" />
 			<input type="button" id="btnDel" value="Eliminar" />
 		</div>
 		
