@@ -228,6 +228,25 @@ public class HomeController {
 
 	}
 
+	@RequestMapping(value = "/modUser", method = RequestMethod.POST)
+	@Transactional
+	@ResponseBody
+	public String modUser(@RequestParam("username") String username,
+			@RequestParam("csrf") String token, HttpServletRequest request,
+			Model mode, HttpSession session) {
+		logger.info("Intentando modificar el usuario {}", username);
+		if (isAdmin(session) && isTokenValid(session, token)) {
+			ServicioAplicacionUsuario sau = new ServicioAplicacionUsuario();
+			Usuario u = sau.readByUsername(entityManager, username);
+			if (u!=null) {
+				return "{\"res\": \"YES\"}";
+			} else
+				return "{\"res\": \"NOPE\"}";
+		} else
+			return "{\"res\": \"NOPE\"}";
+
+	}
+	
 	@RequestMapping(value = "/delGame", method = RequestMethod.POST)
 	@Transactional
 	@ResponseBody
@@ -239,8 +258,9 @@ public class HomeController {
 			ServicioAplicacionPartida sau = new ServicioAplicacionPartida();
 			if (sau.deleteByname(entityManager, gamename)) {
 				return "{\"res\": \"YES\"}";
-			} else
+			} else{
 				return "{\"res\": \"NOPE\"}";
+			}
 		} else
 			return "{\"res\": \"NOPEA\"}";
 
