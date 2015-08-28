@@ -57,7 +57,7 @@ function esFrontera(unId, otroId) {
 function esEnemigo(idPais) {
 	return partida.paises[idPais].propietario != idUsuario;
 }
-function esJugadorActivo(){
+function esJugadorActivo() {
 	return idUsuario == partida.jugadorActivo;
 }
 function clickPais(idPais) {
@@ -81,10 +81,10 @@ function clickPais(idPais) {
 				estado.actual.clickOrigen(idPais);
 			} else
 				estado.actual.clickDestino(idPais);
-		} else if (estado.actual == estado.despliegue){
+		} else if (estado.actual == estado.despliegue) {
 			if (esEnemigo(idPais)) {
 				printInfo("No se puede desplegar unidades sobre países enemigos");
-			} else if (estado.idSel === undefined){
+			} else if (estado.idSel === undefined) {
 				estado.actual.clickDestino(idPais);
 			} else {
 				estado.idSel = idPais;
@@ -168,7 +168,8 @@ var estado = {
 // estado.actual = estado.movimiento;
 
 function pasar() {
-	if (!esJugadorActivo()) return;
+	if (!esJugadorActivo())
+		return;
 	if (estado.actual == estado.despliegue)
 		estado.actual = estado.movimiento;
 	else if (estado.actual == estado.movimiento)
@@ -370,8 +371,13 @@ function sendInfo() {
 		contentType : 'application/json',
 		mimeType : 'application/json',
 		success : function(data) {
-			alert("win");
-			
+			if (data != null) {
+				partida = data;
+				document.getElementById('jsonPartida').value = partida;
+				muestraUnidades();
+			}
+			// alert("win");
+
 			// nos llega info asi q deberíamos repintar el mapa con el resultado
 			// de esto
 
@@ -402,11 +408,14 @@ function dibujarInfoJugadores() { // habrá que cambiarlo por el nombre del
 	for (var i = 0; i < partida.jugadores.length; i++) {
 		var str = '<li class="list-group-item" style="background-color: '
 				+ strToHex(partida.jugadores[i].color) + '">'
-				+ partida.jugadores[i].id + '<span class="badge">' + partida.jugadores[i].unidadesSinDesplegar + '</span>' +'</li>';
+				+ partida.jugadores[i].id + '<span class="badge">'
+				+ partida.jugadores[i].unidadesSinDesplegar + '</span>'
+				+ '</li>';
 		var strActivo = '<li class="list-group-item" style="background-color: '
 				+ strToHex(partida.jugadores[i].color) + '">'
-				+ partida.jugadores[i].id + '<span class="badge">' + 'Su turno ' + partida.jugadores[i].unidadesSinDesplegar +
-				 '</span></li>';
+				+ partida.jugadores[i].id + '<span class="badge">'
+				+ 'Su turno ' + partida.jugadores[i].unidadesSinDesplegar
+				+ '</span></li>';
 		if (partida.jugadores[i].id == partida.jugadorActivo)
 			div.innerHTML = div.innerHTML + strActivo;
 		else

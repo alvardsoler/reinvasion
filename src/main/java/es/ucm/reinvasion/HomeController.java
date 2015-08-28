@@ -39,7 +39,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.google.gson.Gson;
 
-import es.ucm.reinvasion.juego.JuegoPartida;
+import es.ucm.reinvasion.juego.Juego;
 import es.ucm.reinvasion.model.Partida;
 import es.ucm.reinvasion.model.ServicioAplicacionPartida;
 import es.ucm.reinvasion.model.ServicioAplicacionUsuario;
@@ -238,7 +238,7 @@ public class HomeController {
 		if (isAdmin(session) && isTokenValid(session, token)) {
 			ServicioAplicacionUsuario sau = new ServicioAplicacionUsuario();
 			Usuario u = sau.readByUsername(entityManager, username);
-			if (u!=null) {
+			if (u != null) {
 				return "{\"res\": \"YES\"}";
 			} else
 				return "{\"res\": \"NOPE\"}";
@@ -246,7 +246,7 @@ public class HomeController {
 			return "{\"res\": \"NOPE\"}";
 
 	}
-	
+
 	@RequestMapping(value = "/delGame", method = RequestMethod.POST)
 	@Transactional
 	@ResponseBody
@@ -258,7 +258,7 @@ public class HomeController {
 			ServicioAplicacionPartida sau = new ServicioAplicacionPartida();
 			if (sau.deleteByname(entityManager, gamename)) {
 				return "{\"res\": \"YES\"}";
-			} else{
+			} else {
 				return "{\"res\": \"NOPE\"}";
 			}
 		} else
@@ -303,10 +303,11 @@ public class HomeController {
 
 		return "partida";
 	}
+
 	@Transactional
 	@ResponseBody
 	@RequestMapping(value = "/postPartida", method = RequestMethod.POST)
-	protected void doPost(HttpServletRequest request,
+	protected String doPost(HttpServletRequest request,
 			HttpServletResponse response, Model model, HttpSession session)
 			throws ServletException, IOException {
 
@@ -319,33 +320,31 @@ public class HomeController {
 		json = br.readLine();
 
 		Operacion operacion = gson.fromJson(json, Operacion.class);
-		
-		
-		Partida p = ServicioAplicacionPartida.getPartida(entityManager, Integer.parseInt(operacion.getIdPartida()));
-			
+
+		Partida p = ServicioAplicacionPartida.getPartida(entityManager,
+				Integer.parseInt(operacion.getIdPartida()));
 
 		// es.ucm.invasion.juego.Partida partida = p.getPartida();
-		JuegoPartida partida = gson.fromJson(p.getJson(), JuegoPartida.class);
-		
+		Juego partida = gson.fromJson(p.getJson(), Juego.class);
+
 		if (operacion.getOperacion().equals("ataque")) {
 			partida.atacar(operacion.getOp1(), operacion.getOp2());
 		} else if (operacion.getOperacion().equals("movimiento")) {
 			partida.mover(operacion.getOp1(), operacion.getOp2(),
 					operacion.getOp3());
-		} else if (operacion.getOperacion().equals("siguiente")) {		
+		} else if (operacion.getOperacion().equals("siguiente")) {
 			partida.siguiente();
-//			partida.cambiarCartas(operacion.getOp1(), operacion.getOp2());
+			// partida.cambiarCartas(operacion.getOp1(), operacion.getOp2());
 		} else if (operacion.getOperacion().equals("despliegue")) {
 			partida.desplegarUnidades(operacion.getOp1(), operacion.getOp2(),
 					operacion.getOp3());
 		}
-		
 		p.setJson(partida.serializa());
-		ServicioAplicacionPartida.update(entityManager, p);
 		
 		logger.info(operacion.toString());
 
-		model.addAttribute("jsonPartida", p.getJson());
+
+		return p.getJson();
 
 	}
 
@@ -397,10 +396,7 @@ public class HomeController {
 		}
 		model.addAttribute("restoPartidas", noUnido);
 
-		// for (int i = 0; i < sap.readAllByUser(entityManager,
-		// username).size(); i++) {
-		// p.add(sap.readAllByUser(entityManager, username).get(i));
-		// }
+
 		logger.info("Loading partidas from {}", username);
 		logger.info("Values: {}", partidasUsuario);
 
@@ -417,9 +413,7 @@ public class HomeController {
 		logger.info("VIEW: Cargando el usuario {}", username);
 		ServicioAplicacionUsuario sau = new ServicioAplicacionUsuario();
 		Usuario u = sau.readByUsername(entityManager, username);
-		// Usuario u = (Usuario)
-		// entityManager.createNamedQuery("usuarioByLogin")
-		// .setParameter("loginParam", username).getSingleResult();
+	
 		if (u != null)
 			model.addAttribute("userView", u);
 		else

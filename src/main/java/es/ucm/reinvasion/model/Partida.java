@@ -20,7 +20,7 @@ import javax.persistence.NamedQuery;
 
 import com.google.gson.Gson;
 
-import es.ucm.reinvasion.juego.JuegoPartida;
+import es.ucm.reinvasion.juego.Juego;
 import es.ucm.reinvasion.juego.LeerMapa;
 
 @Entity
@@ -87,7 +87,7 @@ public class Partida {
 
 	public void inicializarPartida(EntityManager entityManager)
 			throws IOException {
-		JuegoPartida jp = new JuegoPartida();
+		Juego jp = new Juego();
 		if (entityManager != null) {
 			List<Usuario> jugadores = ServicioAplicacionPartida.getUsersInGame(
 					entityManager, this.id);
@@ -101,7 +101,7 @@ public class Partida {
 		mapa.inicializarMapa(jp);
 		mapa.asignarJugadoresPaises(jp);
 		Gson gson = new Gson();
-		this.json = gson.toJson(jp, JuegoPartida.class);
+		this.json = gson.toJson(jp, Juego.class);
 		System.out.println(this.json);
 		if (estado != EstadoPartida.EN_CURSO) // por si la partida comienza
 												// antes de llegar al máximo

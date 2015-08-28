@@ -57,7 +57,7 @@ public class LeerMapa {
 
 	}
 
-	public void inicializarMapa(JuegoPartida partida) throws IOException {
+	public void inicializarMapa(Juego partida) throws IOException {
 		String linea;
 		Gson gson = new Gson();
 		HashMap<String, Integer> mapa1 = idAlfabeticos();
@@ -94,7 +94,7 @@ public class LeerMapa {
 		br.close();
 	}
 
-	public void asignarJugadoresPaises(JuegoPartida p) {
+	public void asignarJugadoresPaises(Juego p) {
 		Integer[] perm = new Integer[p.getPaises().size()];
 		int a;
 		for (int i = 0; i < p.getPaises().size(); i++) {

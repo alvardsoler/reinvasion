@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import static es.ucm.reinvasion.juego.Dado.tirarDado;
 
-public class JuegoPartida {
+public class Juego {
 
 	private ArrayList<Jugador> jugadores;
 	private ArrayList<Pais> paises;
@@ -36,12 +36,12 @@ public class JuegoPartida {
 		return jugadores;
 	}
 
-	public static JuegoPartida deserializa(String json) {
+	public static Juego deserializa(String json) {
 		Gson gson = new Gson();
-		return gson.fromJson(json, JuegoPartida.class);
+		return gson.fromJson(json, Juego.class);
 	}
 
-	public JuegoPartida() {
+	public Juego() {
 		jugadores = new ArrayList<Jugador>();
 		paises = new ArrayList<Pais>();
 		setTurno(1);
